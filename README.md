@@ -8,4 +8,4 @@ Reports can be made about any medical institution from:
 - Dentists
 - Hospitals
 - NHS
-- Private healthcare facilities.ß
+- Private healthcare facilities.
