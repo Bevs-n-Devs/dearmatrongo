@@ -6,15 +6,18 @@ import (
 )
 
 func StartServer() {
-	// static file server for assets like css, js, images
+	// Initialize templates
+	InitTemplates()
+
+	// Static file server for assets like CSS, JS, images
 	var staticFiles = http.FileServer(http.Dir("./static"))
 	http.Handle("/static/", http.StripPrefix("/static/", staticFiles))
 
-	// define routes
+	// Define routes
 	http.HandleFunc("/", HomePage)
-	// http.HandleFunc("/about", AboutPage)
+	http.HandleFunc("/report", ReportPage)
 
-	// start the server
+	// Start the server
 	log.Println("Starting application...")
 	log.Println("Server running on http://localhost:8080")
 	err := http.ListenAndServe(":8080", nil)

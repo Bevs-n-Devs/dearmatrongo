@@ -10,4 +10,8 @@ func main() {
 	log.Println("Hello world, hello Yaw!")
 
 	handlers.StartServer()
+
+	for _, tmpl := range handlers.Templates.Templates() {
+		log.Println("Parsed template:", tmpl.Name())
+	}
 }

@@ -154,7 +154,7 @@ p {
 }
 /* line 15, ../scss/layout/_nav.scss */
 .navbar-default .navbar-brand:hover {
-  color: #f2013f;
+  color: #0ee0e7;
 }
 /* line 19, ../scss/layout/_nav.scss */
 .navbar-default .navbar-brand span.thin {
@@ -163,11 +163,11 @@ p {
 /* line 24, ../scss/layout/_nav.scss */
 .navbar-default .navbar-toggle {
   border: none;
-  background-color: #f2013f;
+  background-color: #0ee0e7;
 }
 /* line 28, ../scss/layout/_nav.scss */
 .navbar-default .navbar-toggle:hover, .navbar-default .navbar-toggle:focus {
-  background-color: #d90138;
+  background-color: #0ee0e7;
 }
 /* line 32, ../scss/layout/_nav.scss */
 .navbar-default .navbar-toggle .icon-bar {
@@ -187,7 +187,7 @@ p {
 /* line 47, ../scss/layout/_nav.scss */
 .navbar-default .navbar-nav > li > a:hover {
   background-color: transparent;
-  color: #f2013f;
+  color: #0ee0e7;
 }
 /* line 52, ../scss/layout/_nav.scss */
 .navbar-default .navbar-nav > li > a:focus {
@@ -196,12 +196,12 @@ p {
 /* line 57, ../scss/layout/_nav.scss */
 .navbar-default .navbar-nav > li.active > a {
   background-color: #090909;
-  color: #f2013f;
+  color: #0ee0e7;
 }
 /* line 61, ../scss/layout/_nav.scss */
 .navbar-default .navbar-nav > li.active > a:hover {
   background-color: transparent;
-  color: #f2013f;
+  color: #acc6ce;
 }
 /* line 67, ../scss/layout/_nav.scss */
 .navbar-default .navbar-collapse {
@@ -238,7 +238,7 @@ p {
 /* line 1, ../scss/modules/_blocks.scss */
 .service {
   padding: 35px 0 40px;
-  border-top: 1px solid #d00136;
+  border-top: 1px solid #acc6ce;
 }
 /* line 5, ../scss/modules/_blocks.scss */
 .service h2 {
@@ -266,7 +266,7 @@ p {
   font-family: "Open sans", "Sans Serif";
   font-weight: 400;
   display: block;
-  color: #f2013f;
+  color: #acc6ce;
   margin-left: 5px;
 }
 /* line 34, ../scss/modules/_blocks.scss */
@@ -320,7 +320,7 @@ p {
 /* line 85, ../scss/modules/_blocks.scss */
 .team-member-desc-heading span {
   font-size: 18px;
-  color: #F2013F;
+  color: #acc6ce;
 }
 
 /*map*/
@@ -336,7 +336,7 @@ p {
   font-family: "Open sans", "Sans Serif";
   border-radius: 0;
   height: 60px;
-  background-color: #f2013f;
+  background-color: #acc6ce;
   color: #fff;
   font-size: 24px;
   font-weight: 800;
@@ -345,7 +345,7 @@ p {
 }
 /* line 12, ../scss/modules/_buttons.scss */
 .custom-button:hover {
-  background-color: #d90138;
+  background-color: #acc6ce;
 }
 
 /* line 1, ../scss/modules/_sections.scss */
@@ -361,7 +361,7 @@ p {
 /* banner section */
 /* line 11, ../scss/modules/_sections.scss */
 .banner {
-  background-color: #f2013f;
+  background-color: #acc6ce;
 }
 /* line 14, ../scss/modules/_sections.scss */
 .banner .container {
@@ -388,7 +388,7 @@ p {
 
 /* line 38, ../scss/modules/_sections.scss */
 .services {
-  background-color: #f2013f;
+  background-color: #acc6ce;
 }
 
 /*cta*/
@@ -405,7 +405,7 @@ p {
 /*about banner*/
 /* line 55, ../scss/modules/_sections.scss */
 .about-banner {
-  background-color: #f2013f;
+  background-color: #acc6ce;
 }
 
 /* line 59, ../scss/modules/_sections.scss */
@@ -439,7 +439,7 @@ p {
 /*address*/
 /* line 89, ../scss/modules/_sections.scss */
 .address {
-  background-color: #f2013f;
+  background-color: #acc6ce;
 }
 /* line 92, ../scss/modules/_sections.scss */
 .address h1 {
@@ -449,12 +449,12 @@ p {
 /* line 97, ../scss/modules/_sections.scss */
 .address-table {
   color: #fff;
-  border-top: 1px solid #d00136;
+  border-top: 1px solid #acc6ce;
   margin-bottom: 60px;
 }
 /* line 102, ../scss/modules/_sections.scss */
 .address-table td {
-  border-bottom: 1px solid #d00136;
+  border-bottom: 1px solid #acc6ce;
 }
 
 /*email us*/
@@ -586,7 +586,7 @@ p {
   width: 12px;
   height: 12px;
   margin: 0;
-  background-color: #F2013F;
+  background-color: #acc6ce;
 }
 
 /* =================  CAROUSEL CUSTOM FADE EFFECT ===================== */
@@ -869,12 +869,12 @@ table tr td:first-of-type {
 }
 
 .footer-link a:hover {
-  color: #f2013f;
+  color: #acc6ce;
   text-decoration: none;
 }
 
 .footer-text a {
-  color: #f2013f;
+  color: #acc6ce;
 }
 
 .footer-text a:hover {
