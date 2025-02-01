@@ -3,7 +3,9 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/Bevs-n-Devs/dearmatrongo/database"
 	"github.com/Bevs-n-Devs/dearmatrongo/logs"
+	"github.com/Bevs-n-Devs/dearmatrongo/sendemail"
 )
 
 func SubmitReport(w http.ResponseWriter, r *http.Request) {
@@ -31,30 +33,33 @@ func SubmitReport(w http.ResponseWriter, r *http.Request) {
 	facilityName := r.FormValue("facility_name")
 	incidentLocation := r.FormValue("incident_location")
 	severity := r.FormValue("severity")
-	reportingAs := r.FormValue("reporting_as")
+	affiliation := r.FormValue("affiliation")
 	incidentDescription := r.FormValue("incident_description")
 	makeClaim := r.FormValue("make_claim")
-	logMessage = "Name: " + name + ", Email: " + email + ", Phone: " + phone + ", Date: " + date + "Facility Type: " + facilityType + ", Facility Name: " + facilityName + ", Incident Location: " + incidentLocation + ", Severity: " + severity + ", Reporting As: " + reportingAs + ", Incident Description: " + incidentDescription + ", Make Claim: " + makeClaim
-	logs.Log(logs.INFO, logMessage)
 
-	// print data to server log for debugging
-	// log.Println("Name:", name)
-	// log.Println("Email:", email)
-	// log.Println("Phone:", phone)
-	// log.Println("Date:", date)
-	// log.Println("Facility Type:", facilityType)
-	// log.Println("Facility Name:", facilityName)
-	// log.Println("Incident Location:", incidentLocation)
-	// log.Println("Severity:", severity)
-	// log.Println("Reporting As:", reportingAs)
-	// log.Println("Incident Description:", incidentDescription)
-	// log.Println("Make Claim:", makeClaim)
-
-	// save to database
-
-	// check if make_claim is "yes"
-	// if yes, send data via email to 3rd party service
-
+	logMessage = "Name: " + name + ", Email: " + email + ", Phone: " + phone + ", Date: " + date + "Facility Type: " + facilityType + ", Facility Name: " + facilityName + ", Incident Location: " + incidentLocation + ", Severity: " + severity + ", Affiliation: " + affiliation + ", Incident Description: " + incidentDescription + ", Make Claim: " + makeClaim
+	logs.Log(logs.INFO, "New report created - "+logMessage)
+	logs.Log(logs.INFO, "Saving report to database...")
+	err = database.InsertDearMatron(name, email, phone, date, facilityType, facilityName, incidentLocation, severity, affiliation, incidentDescription, makeClaim)
+	if err != nil {
+		logs.Log(logs.ERROR, "Unable to save report to database: "+err.Error())
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	// check if makeClaim == "yes"
+	var checkClaim = checkMakeClaim(makeClaim)
+	if checkClaim {
+		err := sendemail.SendEmailClaim(name, email, phone, date, facilityType, facilityName, incidentLocation, severity, affiliation, incidentDescription)
+		if err != nil {
+			logs.Log(logs.ERROR, "Unable to send email: "+err.Error())
+			logs.Log(logs.WARN, "Report saved to database, but unable to email claim.")
+		}
+	}
 	// redirect to home page
+	logs.Log(logs.INFO, "Redirecting to home page...")
 	http.Redirect(w, r, "/", http.StatusSeeOther)
+}
+
+func checkMakeClaim(claim string) bool {
+	return claim == "yes"
 }
