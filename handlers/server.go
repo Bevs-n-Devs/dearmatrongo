@@ -1,8 +1,9 @@
 package handlers
 
 import (
-	"log"
 	"net/http"
+
+	"github.com/Bevs-n-Devs/dearmatrongo/logs"
 )
 
 func StartServer() {
@@ -16,12 +17,13 @@ func StartServer() {
 	// Define routes
 	http.HandleFunc("/", HomePage)
 	http.HandleFunc("/report", ReportPage)
+	http.HandleFunc("/submit", SubmitReport)
 
 	// Start the server
-	log.Println("Starting application...")
-	log.Println("Server running on http://localhost:8080")
+	logs.Log(logs.INFO, "Starting server...")
+	logs.Log(logs.INFO, "Server running on http://localhost:8080")
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
-		log.Fatal("Server failed to load:", err.Error())
+		logs.Log(logs.ERROR, "Server failed to load: "+err.Error())
 	}
 }

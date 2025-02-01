@@ -1,17 +1,17 @@
 package main
 
 import (
-	"log"
-
 	"github.com/Bevs-n-Devs/dearmatrongo/handlers"
+	"github.com/Bevs-n-Devs/dearmatrongo/logs"
 )
 
 func main() {
-	log.Println("Hello world, hello Yaw!")
+	go logs.ProcessLogs()
+	logs.Log(logs.INFO, "hello world, hello Yaw!")
 
 	handlers.StartServer()
 
 	for _, tmpl := range handlers.Templates.Templates() {
-		log.Println("Parsed template:", tmpl.Name())
+		logs.Log(logs.INFO, "Parsing template:"+tmpl.Name())
 	}
 }

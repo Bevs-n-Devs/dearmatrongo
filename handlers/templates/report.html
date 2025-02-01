@@ -124,44 +124,54 @@
             <div class="col-md-6">
                 <div class="email-wrapper">
                     <h1>Make A Report</h1>
+
+                    <div class="section-snippet hidden-xs">
+                        <span class="snippet-heading">Report Suggestions</span>
+                    </div>
                     <div class="section-snippet hidden-xs">
                         <span class="snippet-heading">Hospitals</span>
-                        <span>support staff</span>  
+                        <span>Diagnosis, Surgery, Hygiene, Medication, Consent</span>  
                     </div>
                     <div class="section-snippet hidden-xs">
                         <span class="snippet-heading">GPs</span>
-                        <span>reply within</span>  
+                        <span>Follow-up, Misdiagnosis, Dismissiveness, Confidentiality, Explanation</span>  
                     </div>
                     <div class="section-snippet hidden-xs">
                         <span class="snippet-heading">Clinics</span>
-                        <span>support staff</span>  
+                        <span>Behaviour, Scheduling, Equipment, Communication, Emergency</span>  
                     </div>
                     <div class="section-snippet hidden-xs">
                         <span class="snippet-heading">Care Homes</span>
-                        <span>reply within</span>  
+                        <span>Neglect, Abuse, Staffing, Hygiene, Medication</span>  
                     </div>
                     <div class="section-snippet hidden-xs">
                         <span class="snippet-heading">Pharmacies</span>
-                        <span>support staff</span>  
+                        <span>Dispensing, Instructions, Service, Delays, Privacy</span>  
                     </div>
                     <div class="section-snippet hidden-xs">
                         <span class="snippet-heading">Dentists</span>
-                        <span>reply within</span>  
+                        <span>Hygiene, Overcharging, Injury, Pain, Records</span>  
                     </div>
                     <div class="section-snippet hidden-xs">
                         <span class="snippet-heading">Opticians</span>
-                        <span>reply within</span>  
+                        <span>Prescriptions, Exams, Equipment, Pricing, Service</span>  
                     </div>
                 </div>  
             </div>
             <div class="col-md-6">
                 <div class="form-wrapper">
-                    <form id="contact-form" action="" method="post">
+                    <form id="contact-form" action="/submit" method="post">
                         <label for="name">Your Name:</label>
                         <input type="text" name="name" id="name" placeholder="your name" required>
 
                         <label for="email">Your email:</label>
                         <input type="email" name="email" id="email" placeholder="your email" required>
+
+                        <label for="phone">Your Phone Number (Optional):</label>
+                        <input type="tel" id="phone" name="phone" placeholder="e.g., +44 123 456 7890">
+
+                        <label for="incident_date">Incident Date:</label>
+                        <input type="date" id="incident_date" name="incident_date" required>
 
                         <label for="facility_type">Facility Type:</label>
                         <select id="facility_type" name="facility_type" required>
@@ -178,14 +188,38 @@
                         <label for="facility_name">Facility Name:</label>
                         <input type="text" id="facility_name" name="facility_name" required>
 
-                        <label for="incident_date">Incident Date:</label>
-                        <input type="date" id="incident_date" name="incident_date" required>
+                        <label for="incident_location">Location of Incident:</label>
+                        <input type="text" id="incident_location" name="incident_location" placeholder="e.g., Room 402, General Ward, XYZ Hospital" required>
+
+                        <label for="severity">Severity of Incident:</label>
+                        <select id="severity" name="severity" required>
+                            <option value="">Please Select</option>
+                            <option value="low">Low</option>
+                            <option value="moderate">Moderate</option>
+                            <option value="severe">Severe</option>
+                        </select>
+                    
+                        <label for="reporting_as">Your Role:</label>
+                        <select id="reporting_as" name="reporting_as" required>
+                            <option value="">Please Select</option>
+                            <option value="patient">Patient</option>
+                            <option value="family_member">Family Member</option>
+                            <option value="employee">Employee</option>
+                            <option value="other">Other</option>
+                        </select>
 
                         <label for="message">Description of Incident:</label>
                         <textarea name="incident_description" id="incident_description" placeholder="Please describe the incident..."></textarea required>
 
-                        <input class="custom-button" type="submit" name="submit" value="send message">
+                        <label for="make_claim">Would you like to be contacted to make a claim?</label>
+                        <select id="make_claim" name="make_claim" required>
+                            <option value="">Please Select</option>
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                        </select>
+                        <p>Note: If you choose "Yes," a third-party organization will contact you to process your claim.</p>
 
+                        <input class="custom-button" type="submit" name="submit" value="send message">
                     </form> 
             </div>
             </div>
