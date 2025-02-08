@@ -2,17 +2,25 @@ package sendemail
 
 import (
 	"net/smtp"
+	"os"
+	"time"
 
+	"github.com/Bevs-n-Devs/dearmatrongo/env"
 	"github.com/Bevs-n-Devs/dearmatrongo/logs"
 )
 
 func SendEmailClaim(name, email, phoneNumber, incidentDate, facilityType, facilityName, location, severity, affiliation, description string) error {
+	logs.Logs(1, "Uploading environment variables to database...")
+	err := env.LoadEnv("env/.env")
+	if err != nil {
+		logs.Logs(3, "Unable to load environment variables: "+err.Error())
+	}
 	// SMTP server config
-	var smptHost = "smtp.gmail.com"
-	var smptPort = "587"
-	var smptUser = "Bevs-n-Devs"     // app email
-	var smptPassword = "Bevs-n-Devs" // app email password
-	var recipient = "Bevs-n-Devs"    // destination email
+	smptHost := "smtp.gmail.com"
+	smptPort := "587"
+	smptUser := os.Getenv("DEAR_MATRON_SEND_EMAIL")              // app email
+	smptPassword := os.Getenv("DEAR_MATRON_SEND_EMAIL_PASSWORD") // app email password
+	recipient := os.Getenv("DEAR_MATRON_RECIEVE_EMAIL")          // destination email
 	// create email message
 	subject := "DEAR MATRON: New Medical Negligence Report"
 	body := "Claimant Name: " + name + "\n" +
@@ -24,14 +32,15 @@ func SendEmailClaim(name, email, phoneNumber, incidentDate, facilityType, facili
 		"Location: " + location + "\n" +
 		"Severity: " + severity + "\n" +
 		"Affiliation: " + affiliation + "\n" +
-		"Description: " + description + "\n"
+		"Description: " + description + "\n" +
+		"Timestamp: " + time.Now().String()
 	// send email
 	auth := smtp.PlainAuth("", smptUser, smptPassword, smptHost)
-	err := smtp.SendMail(smptHost+":"+smptPort, auth, smptUser, []string{recipient}, []byte("Subject: "+subject+"\n\n"+body))
+	err = smtp.SendMail(smptHost+":"+smptPort, auth, smptUser, []string{recipient}, []byte("Subject: "+subject+"\n\n"+body))
 	if err != nil {
-		logs.Log(logs.ERROR, "Unable to send email: "+err.Error())
+		logs.Logs(3, "Unable to send email: "+err.Error())
 		return err
 	}
-	logs.Log(logs.INFO, "Email sent successfully!")
+	logs.Logs(1, "Email sent successfully!")
 	return nil
 }

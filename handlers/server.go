@@ -1,12 +1,19 @@
 package handlers
 
 import (
+	"fmt"
+	"net"
 	"net/http"
 
 	"github.com/Bevs-n-Devs/dearmatrongo/logs"
 )
 
-func StartServer() {
+const (
+	httpServerPort = ":9000"
+	tcpServerPort  = ":8081"
+)
+
+func StartHTTPServer() {
 	// Initialize templates
 	InitTemplates()
 
@@ -18,12 +25,40 @@ func StartServer() {
 	http.HandleFunc("/", HomePage)
 	http.HandleFunc("/report", ReportPage)
 	http.HandleFunc("/submit", SubmitReport)
+	http.HandleFunc("/getReports", GetReports)
 
 	// Start the server
-	logs.Log(logs.INFO, "Starting server...")
-	logs.Log(logs.INFO, "Server running on http://localhost:8080")
-	err := http.ListenAndServe(":8080", nil)
+	logs.Logs(1, "Starting HTTP server...")
+	logs.Logs(1, fmt.Sprintf("Server running on http://localhost%s", httpServerPort))
+	err := http.ListenAndServe(httpServerPort, nil)
 	if err != nil {
-		logs.Log(logs.ERROR, "Server failed to load: "+err.Error())
+		logs.Logs(3, fmt.Sprintf("HTTP server failed to start: %s", err.Error()))
+	}
+}
+
+func StartTCPServer() {
+	logs.Logs(1, fmt.Sprintf("Starting TCP server on port %s", tcpServerPort))
+	listen, err := net.Listen("tcp", tcpServerPort)
+	if err != nil {
+		logs.Logs(3, fmt.Sprintf("TCP server failed to start: %s", err.Error()))
+		return
+	}
+	defer listen.Close()
+
+	for {
+		var buff = make([]byte, 1024) // listen to incoming connections
+		conn, err := listen.Accept()
+		if err != nil {
+			logs.Logs(3, fmt.Sprintf("TCP server failed to accept connection: %s", err.Error()))
+			continue
+		}
+		n, err := conn.Read(buff)
+		if err != nil {
+			logs.Logs(3, fmt.Sprintf("TCP server failed to read data: %s", err.Error()))
+			continue
+		}
+
+		logs.Logs(1, fmt.Sprintf("TCP server received data: %s", string(buff[:n])))
+
 	}
 }

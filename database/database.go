@@ -3,9 +3,12 @@ package database
 import (
 	"database/sql"
 	"errors"
-	"net"
+	"fmt"
 	"os"
-	"time"
+
+	_ "embed"
+
+	_ "github.com/lib/pq"
 
 	"github.com/Bevs-n-Devs/dearmatrongo/env"
 	"github.com/Bevs-n-Devs/dearmatrongo/logs"
@@ -13,73 +16,71 @@ import (
 
 var db *sql.DB
 
-func databaseDriver() {
-	logs.Log(logs.INFO, "Uploading environment variables to database...")
+// connect to database via external DB URL
+func ConnectDB() error {
 	err := env.LoadEnv("env/.env")
 	if err != nil {
-		logs.Log(logs.ERROR, "Unable to load environment variables: "+err.Error())
+		logs.Logs(3, fmt.Sprintf("Unable to load environment variables: %s", err.Error()))
+		return err
 	}
+	databaseURL := os.Getenv("DATABASE_URL")
 
-	var host = os.Getenv("DB_HOST")
-	var port = os.Getenv("DB_PORT")
-	var user = os.Getenv("DB_USER")
-	var password = os.Getenv("DB_PASSWORD")
-	var database = os.Getenv("DB_DATABASE")
-	var sslMode = os.Getenv("DB_SSLMODE")
-	var connectionString = "host=" + host + " port=" + port + " user=" + user + " password=" + password + " dbname=" + database + " sslmode=" + sslMode
-
-	// PostgreSQL DSN (data source name)
-	dsn := connectionString
-
-	// open a raw TCP connection
-	conn, err := net.Dial("tcp", dsn)
+	logs.Logs(4, "Connecting to database...")
+	db, err = sql.Open("postgres", databaseURL)
 	if err != nil {
-		logs.Log(logs.ERROR, "Unable to connect to database: "+err.Error())
+		logs.Logs(5, fmt.Sprintf("Unable to open database connection: %s", err.Error()))
+		return err
 	}
-	defer conn.Close()
-
-	// open database connection
-	db, err = sql.Open("postgres", dsn)
-	if err != nil {
-		logs.Log(logs.ERROR, "Unable to open database connection: "+err.Error())
+	// verify connection
+	logs.Logs(4, "Verifying database connection...")
+	if db == nil {
+		logs.Logs(5, "Database connection is nil!")
+		return errors.New("database connection not establioshed")
 	}
-	defer db.Close()
-
-	// test database connection
 	err = db.Ping()
 	if err != nil {
-		logs.Log(logs.ERROR, "Cannot connect to database: "+err.Error())
+		logs.Logs(5, fmt.Sprintf("Cannot connect to database: %s", err.Error()))
+		return err
 	}
-	logs.Log(logs.INFO, "Database connection successful!")
-	logs.Log(logs.INFO, "Database driver initialized with connection string: "+connectionString)
+	logs.Logs(4, "Database connection successful!")
+	return nil
 }
 
-func GetDB() *sql.DB {
-	return db
+func CloseDB() error {
+	if db != nil {
+		db.Close()
+		logs.Logs(4, "Database connection closed")
+		return nil
+	}
+	logs.Logs(5, "Database connection is not initialized. Could not close database.")
+	return errors.New("database connection is not initialized")
 }
 
-// insert into dear_matron_db table
+// insert into dear_matron table
 /*
-INSERT INTO dear_matron_db (report_id, name, email, phone_number, incident_date, facility_type, facility_name, location, severity, affiliation, description, make_claim, submitted)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+eg.
+INSERT INTO public.dear_matron(
+	name, email, phone_number, incident_date, facility_type, facility_name, location, severity, affiliation, description, make_claim, submitted)
+	VALUES ('john doe', 'jdoe"email.com', '1234567890', '2024-10-26', 'clinic', 'st geroges', 'at home', 'high', 'family member', 'something random', 'yes', NOW());
 */
 func InsertDearMatron(name, email, phoneNumber, incidentDate, facilityType, facilityName, location, severity, affiliation, description, makeClaim string) error {
-	var current = time.Now()
-	var submitted = current.Format("15:04:05 02-01-2006")
-	var query = `
-	INSERT INTO dear_matron_db (report_id, name, email, phone_number, incident_date, facility_type, facility_name, location, severity, affiliation, description, make_claim, submitted)
-	VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12);
-	`
-	logs.Log(logs.INFO, "Creating new report for Dear Matron...")
+	logs.Logs(4, "Creating new report for Dear Matron...")
 	if db == nil {
-		logs.Log(logs.ERROR, "Database connection is not initialized")
+		logs.Logs(5, "Database connection is not initialized")
 		return errors.New("database connection is not initialized")
 	}
-	_, err := db.Exec(query, name, email, phoneNumber, incidentDate, facilityType, facilityName, location, severity, affiliation, description, makeClaim, submitted)
+	// SQL query
+	query := `
+	INSERT INTO dear_matron (name, email, phone_number, incident_date, facility_type, facility_name, location, severity, affiliation, description, make_claim, submitted)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW());
+	`
+	// execute query
+	_, err := db.Exec(query, name, email, phoneNumber, incidentDate, facilityType, facilityName, location, severity, affiliation, description, makeClaim)
 	if err != nil {
-		logs.Log(logs.ERROR, "Unable to create new report for Dear Matron: "+err.Error())
+		logs.Logs(5, fmt.Sprintf("Unable to create new report for Dear Matron: %s", err.Error()))
+		return err
 	}
-	logs.Log(logs.INFO, "New report created for Dear Matron successfully!")
+	logs.Logs(4, "New report created for Dear Matron successfully!")
 	return nil
 }
 
@@ -88,17 +89,17 @@ func InsertDearMatron(name, email, phoneNumber, incidentDate, facilityType, faci
 SELECT * FROM dear_matron_db
 */
 func GetAllData() (*sql.Rows, error) {
-	var query = `
-	SELECT * FROM dear_matron_db
+	query := `
+	SELECT * FROM dear_matron
 	`
-	logs.Log(logs.INFO, "Retrieving all data from dear_matron_db table...")
+	logs.Logs(1, "Retrieving all data from database...")
 	if db == nil {
-		logs.Log(logs.ERROR, "Database connection is not initialized")
+		logs.Logs(5, "Database connection is not initialized")
 		return nil, errors.New("database connection is not initialized")
 	}
 	rows, err := db.Query(query)
 	if err != nil {
-		logs.Log(logs.ERROR, "Unable to retrieve all data from dear_matron_db table: "+err.Error())
+		return nil, err
 	}
 	return rows, nil
 }
