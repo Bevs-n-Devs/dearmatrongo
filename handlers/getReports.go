@@ -2,11 +2,14 @@ package handlers
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 
 	"github.com/Bevs-n-Devs/dearmatrongo/database"
 	"github.com/Bevs-n-Devs/dearmatrongo/logs"
 )
+
+var tmpl = template.Must(template.ParseFiles("handlers/templates/getReports.html"))
 
 func GetReports(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
@@ -15,13 +18,18 @@ func GetReports(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	getData, err := database.GetAllData()
+	getData, err := database.GetAllReports()
 	if err != nil {
 		logs.Logs(3, fmt.Sprintf("Could not retrieve data from database: %s", err.Error()))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
-	logs.Logs(1, "Retrieved data from database")
-	logs.Logs(1, fmt.Sprintf("Data: %v", &getData))
+	// send data to template
+	err = tmpl.Execute(w, getData)
+	if err != nil {
+		logs.Logs(3, fmt.Sprintf("Could not execute HTML template: %s", err.Error()))
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
 }

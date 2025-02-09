@@ -16,6 +16,22 @@ import (
 
 var db *sql.DB
 
+type DearMatronReport struct {
+	ID            int    `json:"dear_matron_id"`
+	Name          string `json:"name"`
+	Email         string `json:"email"`
+	PhoneNumber   string `json:"phone_number"`
+	IncidentDate  string `json:"incident_date"`
+	FacilityType  string `json:"facility_type"`
+	FacilityName  string `json:"facility_name"`
+	Location      string `json:"location"`
+	Severity      string `json:"severity"`
+	Affiliation   string `json:"affiliation"`
+	Description   string `json:"description"`
+	MakeClaim     string `json:"make_claim"`
+	DateSubmitted string `json:"submitted"`
+}
+
 // connect to database via external DB URL
 func ConnectDB() error {
 	err := env.LoadEnv("env/.env")
@@ -102,4 +118,60 @@ func GetAllData() (*sql.Rows, error) {
 		return nil, err
 	}
 	return rows, nil
+}
+
+// get all reports from dear_matron table
+/*
+SELECT * FROM dear_matron
+*/
+// returns a list of DearMatronReport structs
+func GetAllReports() ([]DearMatronReport, error) {
+	query := "SELECT * FROM dear_matron"
+	if db == nil {
+		logs.Logs(5, "Database connection is not initialized")
+		return nil, errors.New("database connection is not initialized")
+	}
+
+	rows, err := db.Query(query)
+	if err != nil {
+		logs.Logs(5, fmt.Sprintf("Unable to retrieve data from database: %s", err.Error()))
+		return nil, err
+	}
+	defer rows.Close()
+
+	// create a slice to hold the results
+	var reports []DearMatronReport
+
+	// loop through the rows and add them to the slice
+	for rows.Next() {
+		var report DearMatronReport
+		err := rows.Scan(
+			&report.ID,
+			&report.Name,
+			&report.Email,
+			&report.PhoneNumber,
+			&report.IncidentDate,
+			&report.FacilityType,
+			&report.FacilityName,
+			&report.Location,
+			&report.Severity,
+			&report.Affiliation,
+			&report.Description,
+			&report.MakeClaim,
+			&report.DateSubmitted,
+		)
+		if err != nil {
+			logs.Logs(5, fmt.Sprintf("Unable to scan row: %s", err.Error()))
+			return nil, err
+		}
+		reports = append(reports, report)
+	}
+	// check for errors
+	err = rows.Err()
+	if err != nil {
+		logs.Logs(5, fmt.Sprintf("Unable to retrieve data from database: %s", err.Error()))
+		return nil, err
+	}
+	return reports, nil
+
 }
