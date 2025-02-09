@@ -9,7 +9,7 @@ import (
 	"github.com/Bevs-n-Devs/dearmatrongo/logs"
 )
 
-var tmpl = template.Must(template.ParseFiles("handlers/templates/getReports.html"))
+var tmpl = template.Must(template.ParseFiles("./handlers/templates/getReports.html"))
 
 func GetReports(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {

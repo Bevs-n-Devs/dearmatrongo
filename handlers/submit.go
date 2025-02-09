@@ -57,5 +57,5 @@ func SubmitReport(w http.ResponseWriter, r *http.Request) {
 }
 
 func checkMakeClaim(claim string) bool {
-	return claim == "yes"
+	return claim == "Yes"
 }
