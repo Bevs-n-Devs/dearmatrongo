@@ -1,1 +1,1 @@
-web: ./dearmatron
+web: ./dearmatrongo
