@@ -1,1 +1,1 @@
-web: ./dearmatrongo
+web: dearmatrongo
