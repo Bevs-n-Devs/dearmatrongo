@@ -34,6 +34,7 @@ type DearMatronReport struct {
 
 // connect to database via external DB URL
 func ConnectDB() error {
+	var err error
 	if os.Getenv("DATABASE_URL") == "" {
 		logs.Logs(2, "Could not get database URL from Heroku. Loading from .env file...")
 		err := env.LoadEnv("env/.env")
@@ -50,7 +51,7 @@ func ConnectDB() error {
 	}
 
 	logs.Logs(4, "Connecting to database...")
-	db, err := sql.Open("postgres", databaseURL)
+	db, err = sql.Open("postgres", databaseURL) // open db connection from global db variable
 	if err != nil {
 		logs.Logs(5, fmt.Sprintf("Unable to open database connection: %s", err.Error()))
 		return err

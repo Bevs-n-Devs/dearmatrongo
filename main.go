@@ -15,7 +15,7 @@ func main() {
 	if err != nil {
 		logs.Logs(3, fmt.Sprintf("Failed to initialize database: %s", err.Error()))
 	}
-	defer database.CloseDB()
+	// defer database.CloseDB() // this keeps the database connection open
 
 	go func() {
 		handlers.StartHTTPServer()
