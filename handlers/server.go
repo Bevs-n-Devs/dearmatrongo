@@ -9,12 +9,7 @@ import (
 )
 
 func StartHTTPServer() {
-	// initialize port
-	httpServerPort := os.Getenv("PORT")
-	if httpServerPort == "" {
-		httpServerPort = "8080"
-	}
-
+	logs.Logs(1, "Starting Dear Matron app...")
 	// Initialize templates
 	InitTemplates()
 
@@ -28,8 +23,19 @@ func StartHTTPServer() {
 	http.HandleFunc("/submit", SubmitReport)
 	http.HandleFunc("/getReports", GetReports)
 
-	// Start the server
-	logs.Logs(1, "Starting HTTP server...")
+	// initialize port
+	httpServerPort := os.Getenv("PORT")
+	// start server on local machine
+	if httpServerPort == "" {
+		logs.Logs(2, "Could not get PORT from Heroku. Starting server on default port http://localhost:9000...")
+		httpServerPort = "9000"
+		err := http.ListenAndServe(fmt.Sprintf(":%s", httpServerPort), nil)
+		if err != nil {
+			logs.Logs(3, fmt.Sprintf("HTTP server failed to start: %s", err.Error()))
+		}
+	}
+
+	// Start the server on Heroku port
 	logs.Logs(1, fmt.Sprintf("Server running on :%s", httpServerPort))
 	err := http.ListenAndServe(fmt.Sprintf(":%s", httpServerPort), nil)
 	if err != nil {
