@@ -17,7 +17,6 @@ func main() {
 	}
 	defer database.CloseDB()
 
-	go handlers.StartTCPServer()
 	go func() {
 		handlers.StartHTTPServer()
 

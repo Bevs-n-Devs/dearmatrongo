@@ -34,15 +34,23 @@ type DearMatronReport struct {
 
 // connect to database via external DB URL
 func ConnectDB() error {
-	err := env.LoadEnv("env/.env")
-	if err != nil {
-		logs.Logs(3, fmt.Sprintf("Unable to load environment variables: %s", err.Error()))
-		return err
+	if os.Getenv("DATABASE_URL") == "" {
+		logs.Logs(2, "Could not get database URL from Heroku. Loading from .env file...")
+		err := env.LoadEnv("env/.env")
+		if err != nil {
+			logs.Logs(3, fmt.Sprintf("Unable to load environment variables: %s", err.Error()))
+			return err
+		}
 	}
+
 	databaseURL := os.Getenv("DATABASE_URL")
+	if databaseURL == "" {
+		logs.Logs(5, "Database URL is empty!")
+		return fmt.Errorf("database URL is empty")
+	}
 
 	logs.Logs(4, "Connecting to database...")
-	db, err = sql.Open("postgres", databaseURL)
+	db, err := sql.Open("postgres", databaseURL)
 	if err != nil {
 		logs.Logs(5, fmt.Sprintf("Unable to open database connection: %s", err.Error()))
 		return err
