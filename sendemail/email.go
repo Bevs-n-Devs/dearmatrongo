@@ -11,16 +11,26 @@ import (
 
 func SendEmailClaim(name, email, phoneNumber, incidentDate, facilityType, facilityName, location, severity, affiliation, description string) error {
 	logs.Logs(1, "Uploading environment variables to database...")
-	err := env.LoadEnv("env/.env")
-	if err != nil {
-		logs.Logs(3, "Unable to load environment variables: "+err.Error())
+	if os.Getenv("DEAR_MATRON_SEND_EMAIL") == "" || os.Getenv("DEAR_MATRON_SEND_EMAIL_PASSWORD") == "" || os.Getenv("DEAR_MATRON_RECIEVE_EMAIL") == "" {
+		logs.Logs(2, "Could not get email credentials from Heroku. Loading from .env file...")
+		err := env.LoadEnv("env/.env")
+		if err != nil {
+			logs.Logs(3, "Unable to load environment variables: "+err.Error())
+		}
 	}
+
 	// SMTP server config
 	smptHost := "smtp.gmail.com"
 	smptPort := "587"
 	smptUser := os.Getenv("DEAR_MATRON_SEND_EMAIL")              // app email
 	smptPassword := os.Getenv("DEAR_MATRON_SEND_EMAIL_PASSWORD") // app email password
 	recipient := os.Getenv("DEAR_MATRON_RECIEVE_EMAIL")          // destination email
+
+	if smptUser == "" || smptPassword == "" || recipient == "" {
+		logs.Logs(3, "Email credentials are empty!")
+		return nil
+	}
+
 	// create email message
 	subject := "DEAR MATRON: New Medical Negligence Report"
 	body := "Claimant Name: " + name + "\n" +
@@ -36,7 +46,7 @@ func SendEmailClaim(name, email, phoneNumber, incidentDate, facilityType, facili
 		"Timestamp: " + time.Now().String()
 	// send email
 	auth := smtp.PlainAuth("", smptUser, smptPassword, smptHost)
-	err = smtp.SendMail(smptHost+":"+smptPort, auth, smptUser, []string{recipient}, []byte("Subject: "+subject+"\n\n"+body))
+	err := smtp.SendMail(smptHost+":"+smptPort, auth, smptUser, []string{recipient}, []byte("Subject: "+subject+"\n\n"+body))
 	if err != nil {
 		logs.Logs(3, "Unable to send email: "+err.Error())
 		return err
