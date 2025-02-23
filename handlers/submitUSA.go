@@ -147,7 +147,7 @@ func SubmitUSA(w http.ResponseWriter, r *http.Request) {
 	// check if makeClaim == "yes"
 	checkClaim := utils.MakeCklaimCheck(makeClaim)
 	if checkClaim {
-		err := sendemail.SendEmailClaim(name, email, phone, date, facilityType, facilityName, incidentLocation, severity, affiliation, incidentDescription)
+		err := sendemail.SendEmailUSA(name, email, phone, date, facilityType, facilityName, incidentLocation, severity, affiliation, incidentDescription)
 		if err != nil {
 			logs.Logs(2, fmt.Sprintf("Unable to send email: %s", err.Error()))
 		}
