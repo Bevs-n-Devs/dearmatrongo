@@ -14,14 +14,6 @@ import (
 	"github.com/Bevs-n-Devs/dearmatrongo/logs"
 )
 
-type GetDearMatronReport struct {
-	FacilityType string `json:"facility_type"`
-	FacilityName string `json:"facility_name"`
-	IncidentDate string `json:"incident_date"`
-	Location     string `json:"location"`
-	Description  string `json:"description"`
-}
-
 // connect to database via external DB URL
 func ConnectDB() error {
 	var err error
@@ -75,10 +67,10 @@ func CloseDB() error {
 /*
 eg.
 INSERT INTO public.dear_matron(
-	name, email, phone_number, incident_date, facility_type, facility_name, location, severity, affiliation, description, make_claim, submitted)
-	VALUES ('john doe', 'jdoe"email.com', '1234567890', '2024-10-26', 'clinic', 'st geroges', 'at home', 'high', 'family member', 'something random', 'yes', NOW(), 'Yes', 'UK');
+	name, email, phone_number, incident_date, facility_type, facility_name, location, severity, affiliation, description, make_claim, make_public, country, submitted)
+	VALUES ('john doe', 'jdoe"email.com', '1234567890', '2024-10-26', 'clinic', 'st geroges', 'at home', 'high', 'family member', 'something random', 'Yes', 'Yes', 'UK', NOW());
 */
-func InsertDearMatron(name, email, phoneNumber, incidentDate, facilityType, facilityName, location, severity, affiliation, description, makeClaim, makePublic, country string) error {
+func InsertDearMatron(name, email, phoneNumber, incidentDate []byte, facilityType string, facilityName, location, severity, affiliation, description, makeClaim []byte, makePublic, country string) error {
 	logs.Logs(4, "Creating new report for Dear Matron...")
 	if db == nil {
 		logs.Logs(5, "Database connection is not initialized")
@@ -86,8 +78,8 @@ func InsertDearMatron(name, email, phoneNumber, incidentDate, facilityType, faci
 	}
 	// SQL query
 	query := `
-	INSERT INTO dear_matron (name, email, phone_number, incident_date, facility_type, facility_name, location, severity, affiliation, description, make_claim, submitted, make_public, country)
-	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW(), $12, $13);
+	INSERT INTO dearmatron (name, email, phone_number, incident_date, facility_type, facility_name, incident_location, severity, affiliation, incident_description, make_claim,  make_public, country, submitted)
+	VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, NOW());
 	`
 	// execute query
 	_, err := db.Exec(query, name, email, phoneNumber, incidentDate, facilityType, facilityName, location, severity, affiliation, description, makeClaim, makePublic, country)
@@ -108,8 +100,8 @@ Returns a list of GetDearMatronReport structs.
 */
 func GetAllReportsUK() ([]GetDearMatronReport, error) {
 	query := `
-	SELECT facility_type, facility_name, incident_date, location, description
-	FROM dear_matron
+	SELECT facility_type, facility_name, incident_date, incident_location, incident_description
+	FROM dearmatron
 	WHERE make_public = 'Yes'
 	AND country = 'UK';`
 	if db == nil {
@@ -134,8 +126,8 @@ func GetAllReportsUK() ([]GetDearMatronReport, error) {
 			&report.FacilityType,
 			&report.FacilityName,
 			&report.IncidentDate,
-			&report.Location,
-			&report.Description,
+			&report.IncidentLocation,
+			&report.IncidentDescription,
 		)
 		if err != nil {
 			logs.Logs(5, fmt.Sprintf("Unable to scan row: %s", err.Error()))
@@ -161,8 +153,8 @@ Returns a slice of GetDearMatronReport structs.
 */
 func GetAllReportsUSA() ([]GetDearMatronReport, error) {
 	query := `
-	SELECT facility_type, facility_name, incident_date, location, description
-	FROM dear_matron
+	SELECT facility_type, facility_name, incident_date, incident_location, incident_description
+	FROM dearmatron
 	WHERE make_public = 'Yes'
 	AND country = 'USA';`
 	if db == nil {
@@ -187,8 +179,8 @@ func GetAllReportsUSA() ([]GetDearMatronReport, error) {
 			&report.FacilityType,
 			&report.FacilityName,
 			&report.IncidentDate,
-			&report.Location,
-			&report.Description,
+			&report.IncidentLocation,
+			&report.IncidentDescription,
 		)
 		if err != nil {
 			logs.Logs(5, fmt.Sprintf("Unable to scan row: %s", err.Error()))
