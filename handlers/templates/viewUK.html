@@ -4,7 +4,7 @@
     <!--meta tags -->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, orientation=landscape">
     <!--meta tags ends-->
 
     <title>Dear Matron | View Reports | UK</title>
@@ -191,26 +191,32 @@
             <div class="col-md-12 main-heading">
                 <h1>Reported Incidents</h1>  
             </div>
-            <div class="col-md-12">
-                <table border="1">
-                    <tr>
-                        <th>Facility Type</th>
-                        <th>Facility Name</th>
-                        <th>Incident Date</th>
-                        <th>Incident Location</th>
-                        <th>Incident Description</th>
-                    </tr>
-                    {{range .}}
-                    <tr>
-                        <td>{{.FacilityType}}</td>
-                        <td>{{.FacilityName}}</td>
-                        <td>{{.IncidentDate}}</td>
-                        <td>{{.Location}}</td>
-                        <td>{{.Description}}</td>
-                    </tr>
-                    {{end}}
-                </table>
-            </div>           
+            <div class="rotate-message">
+                <p>Please rotate your device to landscape mode for the best experience.</p>
+            </div>
+            <div class="main-content">
+                <!-- Your actual page content -->
+                <div class="col-md-12">
+                    <table border="1">
+                        <tr>
+                            <th>Facility Type</th>
+                            <th>Facility Name</th>
+                            <th>Incident Date</th>
+                            <th>Incident Location</th>
+                            <th>Incident Description</th>
+                        </tr>
+                        {{range .}}
+                        <tr>
+                            <td>{{.FacilityType}}</td>
+                            <td>{{.FacilityName}}</td>
+                            <td>{{.IncidentDate}}</td>
+                            <td>{{.Location}}</td>
+                            <td>{{.Description}}</td>
+                        </tr>
+                        {{end}}
+                    </table>
+                </div> 
+            </div>                   
         </div>
     </div>            
 </section>
