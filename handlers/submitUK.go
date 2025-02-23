@@ -7,9 +7,10 @@ import (
 	"github.com/Bevs-n-Devs/dearmatrongo/database"
 	"github.com/Bevs-n-Devs/dearmatrongo/logs"
 	"github.com/Bevs-n-Devs/dearmatrongo/sendemail"
+	"github.com/Bevs-n-Devs/dearmatrongo/utils"
 )
 
-func SubmitReport(w http.ResponseWriter, r *http.Request) {
+func SubmitUK(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		logs.Logs(2, fmt.Sprintf("Invalid request method: %s. Redirecting back to home page.", r.Method))
 		http.Redirect(w, r, "/", http.StatusSeeOther)
@@ -25,6 +26,7 @@ func SubmitReport(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// extract from fields
+	const country = UK
 	name := r.FormValue("name")
 	email := r.FormValue("email")
 	phone := r.FormValue("phone")
@@ -36,15 +38,16 @@ func SubmitReport(w http.ResponseWriter, r *http.Request) {
 	affiliation := r.FormValue("affiliation")
 	incidentDescription := r.FormValue("incident_description")
 	makeClaim := r.FormValue("make_claim")
+	makePublic := r.FormValue("make_public")
 
-	err = database.InsertDearMatron(name, email, phone, date, facilityType, facilityName, incidentLocation, severity, affiliation, incidentDescription, makeClaim)
+	err = database.InsertDearMatron(name, email, phone, date, facilityType, facilityName, incidentLocation, severity, affiliation, incidentDescription, makeClaim, makePublic, country)
 	if err != nil {
 		logs.Logs(3, fmt.Sprintf("Unable to save report to database: %s", err.Error()))
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	// check if makeClaim == "yes"
-	checkClaim := checkMakeClaim(makeClaim)
+	checkClaim := utils.MakeCklaimCheck(makeClaim)
 	if checkClaim {
 		err := sendemail.SendEmailClaim(name, email, phone, date, facilityType, facilityName, incidentLocation, severity, affiliation, incidentDescription)
 		if err != nil {
@@ -52,10 +55,6 @@ func SubmitReport(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	// redirect to home page
-	logs.Logs(1, "Redirecting to home page...")
-	http.Redirect(w, r, "/", http.StatusSeeOther)
-}
-
-func checkMakeClaim(claim string) bool {
-	return claim == "Yes"
+	logs.Logs(1, "Redirecting to Dear Matron UK view page...")
+	http.Redirect(w, r, "/uk/view", http.StatusSeeOther)
 }

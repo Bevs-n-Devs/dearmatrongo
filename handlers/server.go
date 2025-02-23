@@ -19,9 +19,13 @@ func StartHTTPServer() {
 
 	// Define routes
 	http.HandleFunc("/", HomePage)
-	http.HandleFunc("/report", ReportPage)
-	http.HandleFunc("/submit", SubmitReport)
-	http.HandleFunc("/getReports", GetReports)
+	http.HandleFunc("/uk/report", ReportUK)
+	http.HandleFunc("/uk/submit", SubmitUK)
+	http.HandleFunc("/uk/view", ViewUK)
+	http.HandleFunc("/usa", HomeUSA)
+	http.HandleFunc("/usa/report", ReportUSA)
+	http.HandleFunc("/usa/submit", SubmitUSA)
+	http.HandleFunc("/usa/view", ViewUSA)
 
 	// initialize port
 	httpServerPort := os.Getenv("PORT")

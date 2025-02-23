@@ -2,23 +2,20 @@ package handlers
 
 import (
 	"fmt"
-	"html/template"
 	"net/http"
 
 	"github.com/Bevs-n-Devs/dearmatrongo/database"
 	"github.com/Bevs-n-Devs/dearmatrongo/logs"
 )
 
-var tmpl = template.Must(template.ParseFiles("./handlers/templates/getReports.html"))
-
-func GetReports(w http.ResponseWriter, r *http.Request) {
+func ViewUSA(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
-		logs.Logs(2, fmt.Sprintf("Invalid request method: %s. Redirecting back to home page.", r.Method))
-		http.Redirect(w, r, "/", http.StatusSeeOther)
+		logs.Logs(2, fmt.Sprintf("Invalid request method: %s. Redirecting back to Dear Matron USA page.", r.Method))
+		http.Redirect(w, r, "/usa", http.StatusSeeOther)
 		return
 	}
 
-	getData, err := database.GetAllReports()
+	getData, err := database.GetAllReportsUSA()
 	if err != nil {
 		logs.Logs(3, fmt.Sprintf("Could not retrieve data from database: %s", err.Error()))
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
@@ -26,7 +23,7 @@ func GetReports(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// send data to template
-	err = tmpl.Execute(w, getData)
+	err = tmplUSA.Execute(w, getData)
 	if err != nil {
 		logs.Logs(3, fmt.Sprintf("Could not execute HTML template: %s", err.Error()))
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
