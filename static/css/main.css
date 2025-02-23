@@ -880,3 +880,24 @@ table tr td:first-of-type {
 .footer-text a:hover {
   text-decoration: none;
 }
+
+/*
+Rotate the screen message
+*/
+@media screen and (orientation: portrait) {
+  .rotate-message {
+    display: block;
+  }
+  .main-content {
+    display: none;
+  }
+}
+
+@media screen and (orientation: landscape) {
+  .rotate-message {
+    display: none;
+  }
+  .main-content {
+    display: block;
+  }
+}
