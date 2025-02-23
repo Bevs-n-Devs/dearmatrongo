@@ -203,26 +203,32 @@
             <div class="col-md-12 main-heading">
                 <h1 style="color:blue">Reported Incidents</h1>  
             </div>
-            <div class="col-md-12">
-                <table border="1">
-                    <tr>
-                        <th style="color:red">Facility Type</th>
-                        <th style="color:red">Facility Name</th>
-                        <th style="color:red">Incident Date</th>
-                        <th style="color:red">Incident Location</th>
-                        <th style="color:red">Incident Description</th>
-                    </tr>
-                    {{range .}}
-                    <tr>
-                        <td>{{.FacilityType}}</td>
-                        <td>{{.FacilityName}}</td>
-                        <td>{{.IncidentDate}}</td>
-                        <td>{{.Location}}</td>
-                        <td>{{.Description}}</td>
-                    </tr>
-                    {{end}}
-                </table>
-            </div>           
+            <div class="rotate-message">
+                <p>Please rotate your device to landscape mode for the best experience.</p>
+              </div>
+              <div class="main-content">
+                <!-- Your actual page content -->
+                <div class="col-md-12">
+                    <table border="1">
+                        <tr>
+                            <th style="color:red">Facility Type</th>
+                            <th style="color:red">Facility Name</th>
+                            <th style="color:red">Incident Date</th>
+                            <th style="color:red">Incident Location</th>
+                            <th style="color:red">Incident Description</th>
+                        </tr>
+                        {{range .}}
+                        <tr>
+                            <td>{{.FacilityType}}</td>
+                            <td>{{.FacilityName}}</td>
+                            <td>{{.IncidentDate}}</td>
+                            <td>{{.Location}}</td>
+                            <td>{{.Description}}</td>
+                        </tr>
+                        {{end}}
+                    </table>
+                </div>
+              </div>              
         </div>
     </div>            
 </section>
