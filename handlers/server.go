@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/Bevs-n-Devs/dearmatrongo/encrypt"
 	"github.com/Bevs-n-Devs/dearmatrongo/logs"
 )
 
@@ -12,6 +13,10 @@ func StartHTTPServer() {
 	logs.Logs(1, "Starting Dear Matron app...")
 	// Initialize templates
 	InitTemplates()
+	err := encrypt.InitEncryption()
+	if err != nil {
+		logs.Logs(3, fmt.Sprintf("Error initializing encryption: %s", err.Error()))
+	}
 
 	// Static file server for assets like CSS, JS, images
 	var staticFiles = http.FileServer(http.Dir("./static"))
@@ -41,7 +46,7 @@ func StartHTTPServer() {
 
 	// Start the server on Heroku port
 	logs.Logs(1, fmt.Sprintf("Server running on :%s", httpServerPort))
-	err := http.ListenAndServe(fmt.Sprintf(":%s", httpServerPort), nil)
+	err = http.ListenAndServe(fmt.Sprintf(":%s", httpServerPort), nil)
 	if err != nil {
 		logs.Logs(3, fmt.Sprintf("HTTP server failed to start: %s", err.Error()))
 	}
