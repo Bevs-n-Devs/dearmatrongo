@@ -8,8 +8,6 @@ import (
 	"github.com/Bevs-n-Devs/dearmatrongo/logs"
 )
 
-var Templates *template.Template
-
 // initialise HTML templates
 func InitTemplates() {
 	var err error
