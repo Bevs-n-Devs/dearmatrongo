@@ -1,6 +1,7 @@
 package sendemail
 
 import (
+	"fmt"
 	"net/smtp"
 	"os"
 	"time"
@@ -121,6 +122,128 @@ func SendEmailUSA(name, email, phoneNumber, incidentDate, facilityType, facility
 	// send email
 	auth := smtp.PlainAuth("", smptUser, smptPassword, smptHost)
 	err := smtp.SendMail(smptHost+":"+smptPort, auth, smptUser, []string{recipient, ccEmail}, []byte("Subject: "+subject+"\n\n"+body))
+	if err != nil {
+		logs.Logs(3, "Unable to send email: "+err.Error())
+		return err
+	}
+	logs.Logs(1, "Email sent successfully!")
+	return nil
+}
+
+func SearchGDPRDataFailed(name, email string) error {
+	if os.Getenv("DEAR_MATRON_SEND_EMAIL") == "" || os.Getenv("DEAR_MATRON_SEND_EMAIL_PASSWORD") == "" || os.Getenv("DEAR_MATRON_RECIEVE_EMAIL") == "" {
+		logs.Logs(2, "Could not get email credentials from Heroku. Loading from .env file...")
+		err := env.LoadEnv("env/.env")
+		if err != nil {
+			logs.Logs(3, "Unable to load environment variables: "+err.Error())
+		}
+	}
+
+	// SMTP server config
+	smptHost := "smtp.gmail.com"
+	smptPort := "587"
+	smptUser := os.Getenv("DEAR_MATRON_SEND_EMAIL")              // app email
+	smptPassword := os.Getenv("DEAR_MATRON_SEND_EMAIL_PASSWORD") // app email password
+	ccEmail := os.Getenv("DEAR_MATRON_RECIEVE_EMAIL")            // 2nd destination email as backup
+
+	if smptUser == "" || smptPassword == "" || ccEmail == "" {
+		logs.Logs(3, "Email credentials are empty!")
+		return nil
+	}
+
+	subject := fmt.Sprintf("DEAR MATRON: Data could not be deleted for %s", name)
+	body := `
+We received your request to delete your data from our records. However, we were unable to locate a matching report based on the information you provided.
+
+Because we use strong encryption to protect your data, all details must be entered exactly as they were originally submitted—including names, dates, and facility details. Even small differences in spelling, formatting, or spacing can prevent us from finding your record.
+
+If you believe there may have been a mistake in your submission, we kindly ask you to try again using the exact details from your original report.
+
+Alternatively, if you are unable to locate the correct details, please contact us directly at dearmatronuk@gmail.com. To help us conduct a more thorough search, please include all the details you originally provided, including:
+
+- Full Name
+- Email Address
+- Phone Number (if applicable)
+- Date of Incident
+- Facility Type
+- Facility Name
+- Incident Location
+- Incident Severity
+- Your Affiliation
+
+Once we have verified the details, we will make every effort to process your deletion request promptly.
+
+If you have any further questions, please do not hesitate to reach out.
+
+Best regards,
+
+Dear Matron UK
+dearmatronuk@gmail.com
+
+https://dearmatron.com
+	`
+	auth := smtp.PlainAuth("", smptUser, smptPassword, smptHost)
+	err := smtp.SendMail(smptHost+":"+smptPort, auth, smptUser, []string{email, ccEmail}, []byte("Subject: "+subject+"\n\n"+body))
+	if err != nil {
+		logs.Logs(3, "Unable to send email: "+err.Error())
+		return err
+	}
+	logs.Logs(1, "Email sent successfully!")
+	return nil
+}
+
+func SearchGDPRDataFound(name, email, phoneNumber, incidentDate, facilityType, facilityName, location, severity, affiliation, description, claim, public, country, sendToEmail string) error {
+	if os.Getenv("DEAR_MATRON_SEND_EMAIL") == "" || os.Getenv("DEAR_MATRON_SEND_EMAIL_PASSWORD") == "" || os.Getenv("DEAR_MATRON_RECIEVE_EMAIL") == "" {
+		logs.Logs(2, "Could not get email credentials from Heroku. Loading from .env file...")
+		err := env.LoadEnv("env/.env")
+		if err != nil {
+			logs.Logs(3, "Unable to load environment variables: "+err.Error())
+		}
+	}
+
+	// SMTP server config
+	smptHost := "smtp.gmail.com"
+	smptPort := "587"
+	smptUser := os.Getenv("DEAR_MATRON_SEND_EMAIL")              // app email
+	smptPassword := os.Getenv("DEAR_MATRON_SEND_EMAIL_PASSWORD") // app email password
+	ccEmail := os.Getenv("DEAR_MATRON_RECIEVE_EMAIL")            // 2nd destination email as backup
+
+	if smptUser == "" || smptPassword == "" || ccEmail == "" {
+		logs.Logs(3, "Email credentials are empty!")
+		return nil
+	}
+
+	subject := fmt.Sprintf("DEAR MATRON: Data deleted for %s", name)
+	body := fmt.Sprintf(`
+Your data has been successfully deleted from our records.
+
+Name: %s
+Email: %s
+Phone Number: %s
+Incident Date: %s
+Facility Type: %s
+Facility Name: %s
+Location: %s
+Severity: %s
+Affiliation: %s
+Description: %s
+Claim: %s
+Public: %s
+Country: %s
+`, name, email, phoneNumber, incidentDate, facilityType, facilityName, location, severity, affiliation, description, claim, public, country)
+
+	// Create a new MIME message
+	msg := "From: " + smptUser + "\n" +
+		"To: " + sendToEmail + "\n" +
+		"Cc: " + ccEmail + "\n" +
+		"Subject: " + subject + "\n\n" +
+		body
+
+	// Authenticate with the SMTP server
+	auth := smtp.PlainAuth("", smptUser, smptPassword, smptHost)
+
+	// Send the email
+	err := smtp.SendMail(smptHost+":"+smptPort, auth, smptUser, []string{sendToEmail, ccEmail}, []byte(msg))
 	if err != nil {
 		logs.Logs(3, "Unable to send email: "+err.Error())
 		return err

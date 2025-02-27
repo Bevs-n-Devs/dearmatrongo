@@ -2,6 +2,7 @@ package database
 
 import (
 	"database/sql"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"os"
@@ -10,6 +11,7 @@ import (
 
 	_ "github.com/lib/pq"
 
+	"github.com/Bevs-n-Devs/dearmatrongo/encrypt"
 	"github.com/Bevs-n-Devs/dearmatrongo/env"
 	"github.com/Bevs-n-Devs/dearmatrongo/logs"
 )
@@ -195,4 +197,239 @@ func GetAllReportsUSA() ([]GetDearMatronReport, error) {
 		return nil, err
 	}
 	return reports, nil
+}
+
+/*
+CheckGDPRData checks if a record exists in the 'dearmatron' database table
+that matches the provided name, email, incident date, and facility name.
+
+All parameters are encrypted before querying the database.
+
+Parameters:
+
+- name: The unencrypted name of the user.
+
+- email: The unencrypted email of the user.
+
+- incidentDate: The unencrypted date of the incident.
+
+- facilityName: The unencrypted name of the facility.
+
+Returns:
+
+- A boolean indicating whether a matching record is found (true) or not (false).
+*/
+func CheckGDPRData(name, email, incidentDate, facilityName string) (bool, error) {
+	// validate input
+	if name == "" || email == "" || incidentDate == "" || facilityName == "" {
+		return false, errors.New("all parameters are required")
+	}
+
+	// encrypt params
+	encryptName, err := encrypt.Encrypt([]byte(name))
+	if err != nil {
+		logs.Logs(5, fmt.Sprintf("Unable to encrypt name: %s", err.Error()))
+		return false, err
+	}
+	encryptEmail, err := encrypt.Encrypt([]byte(email))
+	if err != nil {
+		logs.Logs(5, fmt.Sprintf("Unable to encrypt email: %s", err.Error()))
+		return false, err
+	}
+	encryptIncidentDate, err := encrypt.Encrypt([]byte(incidentDate))
+	if err != nil {
+		logs.Logs(5, fmt.Sprintf("Unable to encrypt incident date: %s", err.Error()))
+		return false, err
+	}
+	encryptFacilityName, err := encrypt.Encrypt([]byte(facilityName))
+	if err != nil {
+		logs.Logs(5, fmt.Sprintf("Unable to encrypt facility name: %s", err.Error()))
+		return false, err
+	}
+
+	// create a query with encrypted params
+	query := `
+		SELECT 1 FROM dearmatron
+		WHERE name = decode($1, 'hex')
+		AND email = decode($2, 'hex')
+		AND incident_date = decode($3, 'hex')
+		AND facility_name = decode($4, 'hex');
+	`
+
+	// execute query to find matching data within database
+	var exists int
+	err = db.QueryRow(
+		query,
+		hex.EncodeToString(encryptName),
+		hex.EncodeToString(encryptEmail),
+		hex.EncodeToString(encryptIncidentDate),
+		hex.EncodeToString(encryptFacilityName),
+	).Scan(&exists)
+
+	// if found, return true; false otherwise
+	if err == sql.ErrNoRows {
+		logs.Logs(5, "GDPR search could not find data in database")
+		return false, nil
+	}
+
+	if err != nil {
+		logs.Logs(5, fmt.Sprintf("Unable to retrieve data from database: %s", err.Error()))
+		return false, err
+	}
+
+	logs.Logs(5, "GDPR search found data in database")
+	return true, nil
+}
+
+/*
+Returns a single report from the 'dearmatron' database table, given the encrypted name, email, incident date and facility name.
+
+Parameters:
+
+- name: Encrypted name of the user.
+
+- email: Encrypted email of the user.
+
+- incidentDate: Encrypted date of the incident.
+
+- facilityName: Encrypted name of the facility.
+
+Returns:
+
+- The struct of the report if a matching record is found.
+
+- An empty struct and an error if no matching record is found or if there is an error in querying the database.
+*/
+func GDPRDearMatronFullReport(name, email, incidentDate, facilityType string) (GetDearMatronFullReport, error) {
+	// convert strings to encrypted bytes
+	encrytName, err := encrypt.Encrypt([]byte(name))
+	if err != nil {
+		logs.Logs(5, fmt.Sprintf("Unable to encrypt name: %s", err.Error()))
+		return GetDearMatronFullReport{}, err
+	}
+	encrytEmail, err := encrypt.Encrypt([]byte(email))
+	if err != nil {
+		logs.Logs(5, fmt.Sprintf("Unable to encrypt email: %s", err.Error()))
+		return GetDearMatronFullReport{}, err
+	}
+	encrytIncidentDate, err := encrypt.Encrypt([]byte(incidentDate))
+	if err != nil {
+		logs.Logs(5, fmt.Sprintf("Unable to encrypt incident date: %s", err.Error()))
+		return GetDearMatronFullReport{}, err
+	}
+	encrytFacilityType, err := encrypt.Encrypt([]byte(facilityType))
+	if err != nil {
+		logs.Logs(5, fmt.Sprintf("Unable to encrypt facility name: %s", err.Error()))
+		return GetDearMatronFullReport{}, err
+	}
+
+	query := `
+	SELECT * FROM dearmatron
+	WHERE name = decode($1, 'hex')
+    AND email = decode($2, 'hex')
+    AND incident_date = decode($3, 'hex')
+    AND facility_type = decode($4, 'hex');`
+	if db == nil {
+		logs.Logs(5, "Database connection is not initialized")
+		return GetDearMatronFullReport{}, errors.New("database connection is not initialized")
+	}
+
+	rows, err := db.Query(
+		query,
+		hex.EncodeToString(encrytName),
+		hex.EncodeToString(encrytEmail),
+		hex.EncodeToString(encrytIncidentDate),
+		hex.EncodeToString(encrytFacilityType),
+	)
+	if err != nil {
+		logs.Logs(5, fmt.Sprintf("Unable to retrieve data from database: %s", err.Error()))
+		return GetDearMatronFullReport{}, err
+	}
+	defer rows.Close()
+
+	var report GetDearMatronFullReport
+
+	for rows.Next() {
+		err := rows.Scan(
+			&report.Name,
+			&report.Email,
+			&report.PhoneNumber,
+			&report.IncidentDate,
+			&report.FacilityType,
+			&report.FacilityName,
+			&report.IncidentLocation,
+			&report.Severity,
+			&report.Affiliation,
+			&report.IncidentDescription,
+			&report.MakeClaim,
+			&report.MakePublic,
+			&report.Country,
+		)
+		if err != nil {
+			logs.Logs(5, fmt.Sprintf("Unable to scan row: %s", err.Error()))
+			return GetDearMatronFullReport{}, err
+		}
+	}
+
+	err = rows.Err()
+	if err != nil {
+		logs.Logs(5, fmt.Sprintf("Unable to retrieve data from database: %s", err.Error()))
+		return GetDearMatronFullReport{}, err
+	}
+	return report, nil
+}
+
+// DeleteGDPRData deletes a record from the 'dearmatron' database table based on the given encrypted data.
+//
+// Parameters:
+// - name: Encrypted name of the user.
+// - email: Encrypted email of the user.
+// - incidentDate: Encrypted date of the incident.
+// - facilityName: Encrypted name of the facility.
+//
+// Returns:
+// - An error if the deletion fails, otherwise nil.
+
+func DeleteGDPRData(name, email, incidentDate, facilityType string) error {
+	// convert strings to encrypted bytes
+	encryptName, err := encrypt.Encrypt([]byte(name))
+	if err != nil {
+		logs.Logs(5, fmt.Sprintf("Unable to encrypt name: %s", err.Error()))
+		return err
+	}
+	encryptEmail, err := encrypt.Encrypt([]byte(email))
+	if err != nil {
+		logs.Logs(5, fmt.Sprintf("Unable to encrypt email: %s", err.Error()))
+		return err
+	}
+	encryptIncidentDate, err := encrypt.Encrypt([]byte(incidentDate))
+	if err != nil {
+		logs.Logs(5, fmt.Sprintf("Unable to encrypt incident date: %s", err.Error()))
+		return err
+	}
+	encryptFacilityType, err := encrypt.Encrypt([]byte(facilityType))
+	if err != nil {
+		logs.Logs(5, fmt.Sprintf("Unable to encrypt facility name: %s", err.Error()))
+		return err
+	}
+
+	query := `
+	DELETE FROM dearmatron
+	WHERE name = decode($1, 'hex')
+	AND email = decode($2, 'hex')
+	AND incident_date = decode($3, 'hex')
+	AND facility_type = decode($4, 'hex');
+	`
+	_, err = db.Exec(
+		query,
+		hex.EncodeToString(encryptName),
+		hex.EncodeToString(encryptEmail),
+		hex.EncodeToString(encryptIncidentDate),
+		hex.EncodeToString(encryptFacilityType),
+	)
+	if err != nil {
+		logs.Logs(5, fmt.Sprintf("Unable to delete data from database: %s", err.Error()))
+		return err
+	}
+	return nil
 }

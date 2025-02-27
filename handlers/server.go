@@ -31,6 +31,8 @@ func StartHTTPServer() {
 	http.HandleFunc("/usa/report", ReportUSA)
 	http.HandleFunc("/usa/submit", SubmitUSA)
 	http.HandleFunc("/usa/view", ViewUSA)
+	http.HandleFunc("/uk/gdpr", GDPR)
+	http.HandleFunc("/uk/gdpr-delete", DeleteGDPRData)
 
 	// initialize port
 	httpServerPort := os.Getenv("PORT")

@@ -48,5 +48,6 @@ func Decrypt(data []byte) ([]byte, error) {
 	}
 
 	// Return the decrypted plaintext
+	logs.Logs(1, "Data decrypted successfully")
 	return plaintext, nil
 }
