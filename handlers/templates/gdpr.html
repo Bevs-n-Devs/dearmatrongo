@@ -4,23 +4,24 @@
     <!--meta tags -->
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no, orientation=landscape">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <!--meta tags ends-->
 
-    <title>Dear Matron | View Reports | UK</title>
+    <title>Dear Matron | Create Report | GDPR</title>
 
     <!-- meta data -->
-    <meta name="description" content="Read real reports from individuals who have experienced medical negligence. Learn about healthcare issues and raise awareness.">
-    <meta name="keywords" content="medical negligence reports, NHS complaints, patient stories, unsafe healthcare practices">
+    <meta name="description" content="Have you experienced medical negligence? Report your case confidentially and help improve healthcare safety.">
+    <meta name="keywords" content="report medical negligence, NHS complaints, patient rights, healthcare safety, make a complaint">
     <meta name="author" content="Akoto Tech">
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="View Reports - Real Stories of Medical Negligence">
-    <meta property="og:description" content="Browse reports of medical negligence to learn about real patient experiences and help make healthcare safer.">
+    <meta property="og:title" content="Report Medical Negligence - Take Action Now">
+    <meta property="og:description" content="If you or a loved one has experienced medical negligence, report it today to help hold healthcare providers accountable.">
     <meta property="og:image" content="/static/images/dear-matron.jpg">
-    <meta property="og:url" content="https://dearmatron.com/uk/view">
-    <meta property="og:type" content="article">
+    <meta property="og:url" content="https://dearmatron.com/uk/gdpr">
+    <meta property="og:type" content="website">
     <meta property="og:site_name" content="Dear Matron">
     <meta property="og:locale" content="en_GB">
+
 
 
     <!--- Links to google fonts -->
@@ -89,7 +90,7 @@
                                    onmouseout="this.style.color='white';">
                                     USA
                                 </a>
-                            </li>                            
+                            </li>                     
                         </ul>
                     </div>
                     <!-- /.navbar-collapse -->
@@ -101,7 +102,6 @@
             <!-- TOP NAVIGATION ENDS -->
 
         </header>
-        <!-- main header ends-->
 
 <section id="banner" class="banner">
     <div class="container">
@@ -165,63 +165,93 @@
         </div> 
 </section>
 
-<section id="who-are-we" class="who-are-we page">
-    <div class="container wow fadeInUp">
+<section id="email-us" class="email-us page">
+    <div class="container wow fadeInUp" data-wow-delay="0.3s">
         <div class="row">
-            <div class="col-sm-5 col-md-6">
-                <h1>View Reports</h1>
-            </div>
-            <div class="col-sm-7 col-md-6">
-                <p>
-                    Here, you can browse reports submitted by others, detailing incidents within various healthcare facilities. 
-                    Our goal is to raise awareness, promote transparency, and ensure accountability in medical care.
-                </p>
-                <p>
-                    Have you experienced or witnessed medical negligence? Click <a href="/uk/report" style="color:#0ee0e7">here</a> to submit a report and help improve healthcare standards.
-                </p>
-                <p>
-                    If you wish to view our policy and delete your report, click <a href="/uk/data-policy" style="color:#0ee0e7">here</a>.
-                </p>
+            
+            <div class="col-md-6">
+                <div class="email-wrapper">
+                    <h1>Delete Your Data</h1>
 
+                    <div class="section-snippet hidden-xs">
+                        <span class="snippet-heading">Why We Collect Your Information & How You Can Request Deletion</span>
+                    </div>
+                    <div class="section-snippet hidden-xs">
+                        <span class="snippet-heading">Our Policy</span>
+                        <span>
+                            We collect your personal details to ensure that, if you choose to pursue a claim, third parties may contact you for further assistance. 
+                            Your information is securely stored and will never be shared without your consent. If you wish to delete your data from our records, we 
+                            require certain details to accurately locate and remove your report. You will need to provide your name, email, date of the incident, 
+                            and the name of the facility the report was made against. Additionally, we will ask for your email address 
+                            (or an alternative email of your choice) to send a confirmation once your data has been deleted.
+                        </span>  
+                    </div>
+                    <div class="section-snippet hidden-xs">
+                        <span class="snippet-heading">Storing Your Data</span>
+                        <span>
+                            Your privacy and security are our top priorities. 
+                            All personal information you provide is securely 
+                            encrypted before being stored in our database. 
+                            This means that even we cannot directly access 
+                            your data in its original form. Encryption ensures 
+                            that your sensitive details remain protected and can 
+                            only be decrypted when strictly necessary, such as 
+                            for verification purposes. We do not share your 
+                            personal data with third parties unless you choose 
+                            to make a claim, in which case, only the relevant 
+                            details will be securely provided to the appropriate parties.  
+                        </span>
+                    </div>                    
+                    <div class="section-snippet hidden-xs">
+                        <span class="snippet-heading">Finding Your Data</span>
+                        <span>
+                            To ensure your data privacy, we securely encrypt all personal details when storing them. 
+                            When you request data deletion, we encrypt the information you provide and compare it to 
+                            our database to locate your record. If a match is found, we decrypt it for verification, 
+                            delete the entry, and send you a confirmation email. If we cannot find a match, we will 
+                            notify you and provide guidance on how to refine your request for further review.
+                        </span>
+                    </div>
+                </div>  
+            </div>
+            <div class="col-md-6">
+                <div class="form-wrapper">
+                    <form id="contact-form" action="/uk/data-policy-delete" method="post">
+                        <p></p>
+
+                        <label for="name">Your Name:</label>
+                        <input type="text" name="name" id="name" placeholder="your name in report" required>
+
+                        <label for="email">Your email:</label>
+                        <input type="email" name="email" id="email" placeholder="email made in report" required>
+
+                        <label for="incident_date">Incident Date:</label>
+                        <input type="date" id="incident_date" name="incident_date" required>
+
+                        <label for="facility_type">Facility Type:</label>
+                        <select id="facility_type" name="facility_type" required>
+                            <option value="">Please Select</option>
+                            <option value="Hospital">Hospital</option>
+                            <option value="Clinic">Clinic</option>
+                            <option value="GP">GP</option>
+                            <option value="Care Home">Care Home</option>
+                            <option value="Pharmacy">Pharmacy</option>
+                            <option value="Dentist">Dentist</option>
+                            <option value="Optician">Optician</option>
+                        </select>
+
+                        <label for="facility_name">Facility Name:</label>
+                        <input type="text" id="facility_name" name="facility_name" required>
+
+                        <label for="send_data_email">Send Your Deleted Data To:</label>
+                        <input type="email" name="send_data_email" id="send_data_email" placeholder="your email to send confirmation" required>
+
+                        <input class="custom-button" type="submit" name="submit" value="send message">
+                    </form> 
+            </div>
             </div>
         </div>
     </div>
-</section>
-<!-- most probably like canvas -->
-<section id="services" class="services page">
-    <div class="container wow fadeInUp">
-        <div class="row">
-            <div class="col-md-12 main-heading">
-                <h1>Reported Incidents</h1>  
-            </div>
-            <div class="rotate-message">
-                <p>Please rotate your device to landscape mode for the best experience.</p>
-            </div>
-            <div class="main-content">
-                <!-- Your actual page content -->
-                <div class="col-md-12">
-                    <table border="1">
-                        <tr>
-                            <th>Facility Type</th>
-                            <th>Facility Name</th>
-                            <th>Incident Date</th>
-                            <th>Incident Location</th>
-                            <th>Incident Description</th>
-                        </tr>
-                        {{range .}}
-                        <tr>
-                            <td>{{.FacilityType}}</td>
-                            <td>{{.FacilityName}}</td>
-                            <td>{{.IncidentDate}}</td>
-                            <td>{{.IncidentLocation}}</td>
-                            <td>{{.IncidentDescription}}</td>
-                        </tr>
-                        {{end}}
-                    </table>
-                </div> 
-            </div>                   
-        </div>
-    </div>            
 </section>
 
 <footer id="footer" class="footer">
