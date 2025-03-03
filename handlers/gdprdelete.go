@@ -51,7 +51,7 @@ func DeleteGDPRData(w http.ResponseWriter, r *http.Request) {
 	// if there is no matching data, redirect back to GDPR page
 	if !match {
 		// send email to user to confirm no match
-		err := sendemail.SearchGDPRDataFailed(name, sendDataEmail)
+		err := sendemail.SearchDataPolicyDataFailed(name, sendDataEmail)
 		if err != nil {
 			logs.Logs(3, fmt.Sprintf("Could not send email: %s", err.Error()))
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -153,7 +153,7 @@ func DeleteGDPRData(w http.ResponseWriter, r *http.Request) {
 	convertedData.MakeClaim = string(getData.MakeClaim)
 
 	// Send confirmation email to the user with the decrypted GDPR data
-	err = sendemail.SearchGDPRDataFound(
+	err = sendemail.SearchDataPolicyDataFound(
 		convertedData.Name,
 		convertedData.Email,
 		convertedData.PhoneNumber,
