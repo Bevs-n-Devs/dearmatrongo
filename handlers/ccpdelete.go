@@ -10,10 +10,10 @@ import (
 	"github.com/Bevs-n-Devs/dearmatrongo/sendemail"
 )
 
-func DeleteGDPRData(w http.ResponseWriter, r *http.Request) {
+func DeleteCCPAData(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		logs.Logs(2, fmt.Sprintf("Invalid request method: %s. Redirecting back to GDPR page.", r.Method))
-		http.Redirect(w, r, "/uk/data-policy", http.StatusSeeOther)
+		http.Redirect(w, r, "/usa/data-policy", http.StatusSeeOther)
 		return
 	}
 
@@ -26,7 +26,7 @@ func DeleteGDPRData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// extract from fields
-	const country = UK
+	const country = USA
 	name := r.FormValue("name")
 	email := r.FormValue("email")
 	incidentDate := r.FormValue("incident_date")
@@ -58,7 +58,7 @@ func DeleteGDPRData(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		logs.Logs(2, "GDPR data not found in database. Redirecting back to GDPR page.")
-		http.Redirect(w, r, "/uk/data-policy", http.StatusSeeOther)
+		http.Redirect(w, r, "/usa/data-policy", http.StatusSeeOther)
 		return
 	}
 
@@ -184,5 +184,5 @@ func DeleteGDPRData(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logs.Logs(1, "GDPR data deleted successfully")
-	http.Redirect(w, r, "/", http.StatusSeeOther)
+	http.Redirect(w, r, "/usa", http.StatusSeeOther)
 }
