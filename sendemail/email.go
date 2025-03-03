@@ -47,18 +47,25 @@ func SendEmailUK(name, email, phoneNumber, incidentDate, facilityType, facilityN
 	}
 
 	// create email message
-	subject := "DEAR MATRON: New Medical Negligence Report"
-	body := "Claimant Name: " + name + "\n" +
-		"Claimant Email: " + email + "\n" +
-		"Claimant Phone Number: " + phoneNumber + "\n" +
-		"Incident Date: " + incidentDate + "\n" +
-		"Facility Type: " + facilityType + "\n" +
-		"Facility Name: " + facilityName + "\n" +
-		"Location: " + location + "\n" +
-		"Severity: " + severity + "\n" +
-		"Affiliation: " + affiliation + "\n" +
-		"Description: " + description + "\n" +
-		"Timestamp: " + time.Now().String()
+	subject := fmt.Sprintf("DEAR MATRON: New Medical Negligence Report for %s", name)
+	body := fmt.Sprintf(`
+	Claimant Name: %s
+	Claimant Email: %s
+	Claimant Phone Number: %s
+	Incident Date: %s
+	Facility Type: %s
+	Facility Name: %s
+	Location of Incident: %s
+	Severity of Incident: %s
+	Affiliation: %s
+	Description of Incident: %s
+	Timestamp: %s
+
+	Dear Matron
+	dearmatron@gmail.com
+
+	https://dearmatron.com
+	`, name, email, phoneNumber, incidentDate, facilityType, facilityName, location, severity, affiliation, description, time.Now().Format("2006-01-02 15:04:05"))
 	// send email
 	auth := smtp.PlainAuth("", smptUser, smptPassword, smptHost)
 	err := smtp.SendMail(smptHost+":"+smptPort, auth, smptUser, []string{recipient, ccEmail}, []byte("Subject: "+subject+"\n\n"+body))
@@ -107,18 +114,25 @@ func SendEmailUSA(name, email, phoneNumber, incidentDate, facilityType, facility
 	}
 
 	// create email message
-	subject := "DEAR MATRON: New Medical Negligence Report"
-	body := "Claimant Name: " + name + "\n" +
-		"Claimant Email: " + email + "\n" +
-		"Claimant Phone Number: " + phoneNumber + "\n" +
-		"Incident Date: " + incidentDate + "\n" +
-		"Facility Type: " + facilityType + "\n" +
-		"Facility Name: " + facilityName + "\n" +
-		"Location: " + location + "\n" +
-		"Severity: " + severity + "\n" +
-		"Affiliation: " + affiliation + "\n" +
-		"Description: " + description + "\n" +
-		"Timestamp: " + time.Now().String()
+	subject := fmt.Sprintf("DEAR MATRON: New Medical Malpractice Report for %s", name)
+	body := fmt.Sprintf(`
+	Claimant Name: %s
+	Claimant Email: %s
+	Claimant Phone Number: %s
+	Incident Date: %s
+	Facility Type: %s
+	Facility Name: %s
+	Location of Incident: %s
+	Severity of Incident: %s
+	Affiliation: %s
+	Description of Incident: %s
+	Timestamp: %s
+
+	Dear Matron
+	dearmatron@gmail.com
+
+	https://dearmatron.com
+	`, name, email, phoneNumber, incidentDate, facilityType, facilityName, location, severity, affiliation, description, time.Now().Format("2006-01-02 15:04:05"))
 	// send email
 	auth := smtp.PlainAuth("", smptUser, smptPassword, smptHost)
 	err := smtp.SendMail(smptHost+":"+smptPort, auth, smptUser, []string{recipient, ccEmail}, []byte("Subject: "+subject+"\n\n"+body))
@@ -130,7 +144,7 @@ func SendEmailUSA(name, email, phoneNumber, incidentDate, facilityType, facility
 	return nil
 }
 
-func SearchGDPRDataFailed(name, email string) error {
+func SearchDataPolicyDataFailed(name, email string) error {
 	if os.Getenv("DEAR_MATRON_SEND_EMAIL") == "" || os.Getenv("DEAR_MATRON_SEND_EMAIL_PASSWORD") == "" || os.Getenv("DEAR_MATRON_RECIEVE_EMAIL") == "" {
 		logs.Logs(2, "Could not get email credentials from Heroku. Loading from .env file...")
 		err := env.LoadEnv("env/.env")
@@ -159,17 +173,17 @@ Because we use strong encryption to protect your data, all details must be enter
 
 If you believe there may have been a mistake in your submission, we kindly ask you to try again using the exact details from your original report.
 
-Alternatively, if you are unable to locate the correct details, please contact us directly at dearmatronuk@gmail.com. To help us conduct a more thorough search, please include all the details you originally provided, including:
+Alternatively, if you are unable to locate the correct details, please contact us directly at dearmatron@gmail.com. To help us conduct a more thorough search, please include all the details you originally provided, including:
 
 - Full Name
 - Email Address
 - Phone Number (if applicable)
 - Date of Incident
-- Facility Type
+- Facility Type 
 - Facility Name
 - Incident Location
-- Incident Severity
-- Your Affiliation
+- Severity of Incident (low, moderate, or severe)
+- Your Affiliation (patient, family member, employee, other)
 
 Once we have verified the details, we will make every effort to process your deletion request promptly.
 
@@ -177,8 +191,8 @@ If you have any further questions, please do not hesitate to reach out.
 
 Best regards,
 
-Dear Matron UK
-dearmatronuk@gmail.com
+Dear Matron
+dearmatron@gmail.com
 
 https://dearmatron.com
 	`
@@ -192,7 +206,7 @@ https://dearmatron.com
 	return nil
 }
 
-func SearchGDPRDataFound(name, email, phoneNumber, incidentDate, facilityType, facilityName, location, severity, affiliation, description, claim, public, country, sendToEmail string) error {
+func SearchDataPolicyDataFound(name, email, phoneNumber, incidentDate, facilityType, facilityName, location, severity, affiliation, description, claim, public, country, sendToEmail string) error {
 	if os.Getenv("DEAR_MATRON_SEND_EMAIL") == "" || os.Getenv("DEAR_MATRON_SEND_EMAIL_PASSWORD") == "" || os.Getenv("DEAR_MATRON_RECIEVE_EMAIL") == "" {
 		logs.Logs(2, "Could not get email credentials from Heroku. Loading from .env file...")
 		err := env.LoadEnv("env/.env")
@@ -230,6 +244,15 @@ Description: %s
 Claim: %s
 Public: %s
 Country: %s
+
+If you have any further questions, please do not hesitate to reach out.
+
+Best regards,
+
+Dear Matron
+dearmatron@gmail.com
+
+https://dearmatron.com
 `, name, email, phoneNumber, incidentDate, facilityType, facilityName, location, severity, affiliation, description, claim, public, country)
 
 	// Create a new MIME message
