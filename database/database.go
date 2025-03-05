@@ -19,48 +19,48 @@ import (
 func ConnectDB() error {
 	var err error
 	if os.Getenv("DATABASE_URL") == "" {
-		logs.Logs(2, "Could not get database URL from Heroku. Loading from .env file...")
+		logs.Logs(logWarning, "Could not get database URL from Heroku. Loading from .env file...")
 		err := env.LoadEnv("env/.env")
 		if err != nil {
-			logs.Logs(3, fmt.Sprintf("Unable to load environment variables: %s", err.Error()))
+			logs.Logs(logError, fmt.Sprintf("Unable to load environment variables: %s", err.Error()))
 			return err
 		}
 	}
 
 	databaseURL := os.Getenv("DATABASE_URL")
 	if databaseURL == "" {
-		logs.Logs(5, "Database URL is empty!")
+		logs.Logs(logDbError, "Database URL is empty!")
 		return fmt.Errorf("database URL is empty")
 	}
 
-	logs.Logs(4, "Connecting to database...")
+	logs.Logs(logDb, "Connecting to database...")
 	db, err = sql.Open("postgres", databaseURL) // open db connection from global db variable
 	if err != nil {
-		logs.Logs(5, fmt.Sprintf("Unable to open database connection: %s", err.Error()))
+		logs.Logs(logDbError, fmt.Sprintf("Unable to open database connection: %s", err.Error()))
 		return err
 	}
 	// verify connection
-	logs.Logs(4, "Verifying database connection...")
+	logs.Logs(logDb, "Verifying database connection...")
 	if db == nil {
-		logs.Logs(5, "Database connection is nil!")
+		logs.Logs(logDbError, "Database connection is nil!")
 		return errors.New("database connection not establioshed")
 	}
 	err = db.Ping()
 	if err != nil {
-		logs.Logs(5, fmt.Sprintf("Cannot connect to database: %s", err.Error()))
+		logs.Logs(logDbError, fmt.Sprintf("Cannot connect to database: %s", err.Error()))
 		return err
 	}
-	logs.Logs(4, "Database connection successful!")
+	logs.Logs(logDb, "Database connection successful!")
 	return nil
 }
 
 func CloseDB() error {
 	if db != nil {
 		db.Close()
-		logs.Logs(4, "Database connection closed")
+		logs.Logs(logDb, "Database connection closed")
 		return nil
 	}
-	logs.Logs(5, "Database connection is not initialized. Could not close database.")
+	logs.Logs(logDbError, "Database connection is not initialized. Could not close database.")
 	return errors.New("database connection is not initialized")
 }
 
@@ -103,7 +103,7 @@ Returns:
 */
 func CreateDearMatronReport(name, email, phoneNumber, incidentDate, facilityType, facilityName, incidentLocation, severity, affiliation, description, makeClaim, makePublic, country string) error {
 	if db == nil {
-		logs.Logs(5, "Database connection is not initialized")
+		logs.Logs(logDbError, "Database connection is not initialized")
 		return errors.New("database connection is not initialized")
 	}
 
@@ -111,64 +111,64 @@ func CreateDearMatronReport(name, email, phoneNumber, incidentDate, facilityType
 	hashName := encrypt.HashData(name)
 	encryptName, err := encrypt.Encrypt([]byte(name))
 	if err != nil {
-		logs.Logs(5, fmt.Sprintf("Could not encrypt name: %s", err.Error()))
+		logs.Logs(logDbError, fmt.Sprintf("Could not encrypt name: %s", err.Error()))
 		return err
 	}
 
 	hashEmail := encrypt.HashData(email)
 	encryptEmail, err := encrypt.Encrypt([]byte(email))
 	if err != nil {
-		logs.Logs(5, fmt.Sprintf("Could not encrypt email: %s", err.Error()))
+		logs.Logs(logDbError, fmt.Sprintf("Could not encrypt email: %s", err.Error()))
 		return err
 	}
 
 	encryptNumber, err := encrypt.Encrypt([]byte(phoneNumber))
 	if err != nil {
-		logs.Logs(5, fmt.Sprintf("Could not encrypt phone number: %s", err.Error()))
+		logs.Logs(logDbError, fmt.Sprintf("Could not encrypt phone number: %s", err.Error()))
 		return err
 	}
 
 	hashDate := encrypt.HashData(incidentDate)
 	encryptDate, err := encrypt.Encrypt([]byte(incidentDate))
 	if err != nil {
-		logs.Logs(5, fmt.Sprintf("Could not encrypt incident date: %s", err.Error()))
+		logs.Logs(logDbError, fmt.Sprintf("Could not encrypt incident date: %s", err.Error()))
 		return err
 	}
 
 	hashFacilityName := encrypt.HashData(facilityName)
 	encryptFacilityName, err := encrypt.Encrypt([]byte(facilityName))
 	if err != nil {
-		logs.Logs(5, fmt.Sprintf("Could not encrypt facility name: %s", err.Error()))
+		logs.Logs(logDbError, fmt.Sprintf("Could not encrypt facility name: %s", err.Error()))
 		return err
 	}
 
 	encryptIncidentLocation, err := encrypt.Encrypt([]byte(incidentLocation))
 	if err != nil {
-		logs.Logs(5, fmt.Sprintf("Could not encrypt incident location: %s", err.Error()))
+		logs.Logs(logDbError, fmt.Sprintf("Could not encrypt incident location: %s", err.Error()))
 		return err
 	}
 
 	encryptSeverity, err := encrypt.Encrypt([]byte(severity))
 	if err != nil {
-		logs.Logs(5, fmt.Sprintf("Could not encrypt severity: %s", err.Error()))
+		logs.Logs(logDbError, fmt.Sprintf("Could not encrypt severity: %s", err.Error()))
 		return err
 	}
 
 	encryptAffiliation, err := encrypt.Encrypt([]byte(affiliation))
 	if err != nil {
-		logs.Logs(5, fmt.Sprintf("Could not encrypt affiliation: %s", err.Error()))
+		logs.Logs(logDbError, fmt.Sprintf("Could not encrypt affiliation: %s", err.Error()))
 		return err
 	}
 
 	encryptDescription, err := encrypt.Encrypt([]byte(description))
 	if err != nil {
-		logs.Logs(5, fmt.Sprintf("Could not encrypt description: %s", err.Error()))
+		logs.Logs(logDbError, fmt.Sprintf("Could not encrypt description: %s", err.Error()))
 		return err
 	}
 
 	encryptMakeClaim, err := encrypt.Encrypt([]byte(makeClaim))
 	if err != nil {
-		logs.Logs(5, fmt.Sprintf("Could not encrypt make claim: %s", err.Error()))
+		logs.Logs(logDbError, fmt.Sprintf("Could not encrypt make claim: %s", err.Error()))
 		return err
 	}
 
@@ -219,7 +219,7 @@ func CreateDearMatronReport(name, email, phoneNumber, incidentDate, facilityType
 		country,
 	)
 	if err != nil {
-		logs.Logs(5, fmt.Sprintf("Could not insert data into database: %s", err.Error()))
+		logs.Logs(logDbError, fmt.Sprintf("Could not insert data into database: %s", err.Error()))
 		return err
 	}
 
@@ -240,13 +240,13 @@ func GetAllReportsUK() ([]GetDearMatronReport, error) {
 	WHERE make_public = 'Yes'
 	AND country = 'UK';`
 	if db == nil {
-		logs.Logs(5, "Database connection is not initialized")
+		logs.Logs(logDbError, "Database connection is not initialized")
 		return nil, errors.New("database connection is not initialized")
 	}
 
 	rows, err := db.Query(query)
 	if err != nil {
-		logs.Logs(5, fmt.Sprintf("Unable to retrieve data from database: %s", err.Error()))
+		logs.Logs(logDbError, fmt.Sprintf("Unable to retrieve data from database: %s", err.Error()))
 		return nil, err
 	}
 	defer rows.Close()
@@ -265,7 +265,7 @@ func GetAllReportsUK() ([]GetDearMatronReport, error) {
 			&report.IncidentDescription,
 		)
 		if err != nil {
-			logs.Logs(5, fmt.Sprintf("Unable to scan row: %s", err.Error()))
+			logs.Logs(logDbError, fmt.Sprintf("Unable to scan row: %s", err.Error()))
 			return nil, err
 		}
 		reports = append(reports, report)
@@ -273,7 +273,7 @@ func GetAllReportsUK() ([]GetDearMatronReport, error) {
 	// check for errors
 	err = rows.Err()
 	if err != nil {
-		logs.Logs(5, fmt.Sprintf("Unable to retrieve data from database: %s", err.Error()))
+		logs.Logs(logDbError, fmt.Sprintf("Unable to retrieve data from database: %s", err.Error()))
 		return nil, err
 	}
 	return reports, nil
@@ -293,13 +293,13 @@ func GetAllReportsUSA() ([]GetDearMatronReport, error) {
 	WHERE make_public = 'Yes'
 	AND country = 'USA';`
 	if db == nil {
-		logs.Logs(5, "Database connection is not initialized")
+		logs.Logs(logDbError, "Database connection is not initialized")
 		return nil, errors.New("database connection is not initialized")
 	}
 
 	rows, err := db.Query(query)
 	if err != nil {
-		logs.Logs(5, fmt.Sprintf("Unable to retrieve data from database: %s", err.Error()))
+		logs.Logs(logDbError, fmt.Sprintf("Unable to retrieve data from database: %s", err.Error()))
 		return nil, err
 	}
 	defer rows.Close()
@@ -318,7 +318,7 @@ func GetAllReportsUSA() ([]GetDearMatronReport, error) {
 			&report.IncidentDescription,
 		)
 		if err != nil {
-			logs.Logs(5, fmt.Sprintf("Unable to scan row: %s", err.Error()))
+			logs.Logs(logDbError, fmt.Sprintf("Unable to scan row: %s", err.Error()))
 			return nil, err
 		}
 		reports = append(reports, report)
@@ -326,7 +326,7 @@ func GetAllReportsUSA() ([]GetDearMatronReport, error) {
 	// check for errors
 	err = rows.Err()
 	if err != nil {
-		logs.Logs(5, fmt.Sprintf("Unable to retrieve data from database: %s", err.Error()))
+		logs.Logs(logDbError, fmt.Sprintf("Unable to retrieve data from database: %s", err.Error()))
 		return nil, err
 	}
 	return reports, nil
@@ -397,12 +397,12 @@ func CheckGDPRData(name, email, incidentDate, facilityType, facilityName string)
 	)
 
 	if err == sql.ErrNoRows {
-		logs.Logs(2, "No matching data found in database")
+		logs.Logs(logDbError, "No matching data found in database")
 		return false, nil
 	}
 
 	if err != nil {
-		logs.Logs(5, fmt.Sprintf("Unable to retrieve data from database: %s", err.Error()))
+		logs.Logs(logDbError, fmt.Sprintf("Unable to retrieve data from database: %s", err.Error()))
 		return false, err
 	}
 
@@ -414,22 +414,22 @@ func CheckGDPRData(name, email, incidentDate, facilityType, facilityName string)
 
 	// if any of the checks fail, return false
 	if !checkName {
-		logs.Logs(3, "Name does not match")
+		logs.Logs(logDbError, "Name does not match")
 		return false, nil
 	}
 
 	if !checkEmail {
-		logs.Logs(3, "Email does not match")
+		logs.Logs(logDbError, "Email does not match")
 		return false, nil
 	}
 
 	if !checkIncidentDate {
-		logs.Logs(3, "Incident date does not match")
+		logs.Logs(logDbError, "Incident date does not match")
 		return false, nil
 	}
 
 	if !checkFacilityName {
-		logs.Logs(3, "Facility name does not match")
+		logs.Logs(logDbError, "Facility name does not match")
 		return false, nil
 	}
 
@@ -467,7 +467,7 @@ func DearMatronFullReport(name, email, incidentDate, facilityType, facilityName,
 		AND hash_facility_name = $5
 		AND country = $6;`
 	if db == nil {
-		logs.Logs(5, "Database connection is not initialized")
+		logs.Logs(logDbError, "Database connection is not initialized")
 		return GetDearMatronFullReport{}, errors.New("database connection is not initialized")
 	}
 
@@ -481,7 +481,7 @@ func DearMatronFullReport(name, email, incidentDate, facilityType, facilityName,
 		country,
 	)
 	if err != nil {
-		logs.Logs(5, fmt.Sprintf("Unable to retrieve data from database: %s", err.Error()))
+		logs.Logs(logDbError, fmt.Sprintf("Unable to retrieve data from database: %s", err.Error()))
 		return GetDearMatronFullReport{}, err
 	}
 	defer rows.Close()
@@ -505,14 +505,14 @@ func DearMatronFullReport(name, email, incidentDate, facilityType, facilityName,
 			&report.Country,
 		)
 		if err != nil {
-			logs.Logs(5, fmt.Sprintf("Unable to scan row: %s", err.Error()))
+			logs.Logs(logDbError, fmt.Sprintf("Unable to scan row: %s", err.Error()))
 			return GetDearMatronFullReport{}, err
 		}
 	}
 
 	err = rows.Err()
 	if err != nil {
-		logs.Logs(5, fmt.Sprintf("Unable to retrieve data from database: %s", err.Error()))
+		logs.Logs(logDbError, fmt.Sprintf("Unable to retrieve data from database: %s", err.Error()))
 		return GetDearMatronFullReport{}, err
 	}
 	return report, nil
@@ -539,7 +539,7 @@ Returns:
 */
 func DeleteGDPRData(name, email, incidentDate, facilityType, facilityName, country string) error {
 	if db == nil {
-		logs.Logs(5, "Database connection is not initialized")
+		logs.Logs(logDbError, "Database connection is not initialized")
 		return errors.New("database connection is not initialized")
 	}
 
@@ -570,7 +570,7 @@ func DeleteGDPRData(name, email, incidentDate, facilityType, facilityName, count
 	)
 
 	if err != nil {
-		logs.Logs(5, fmt.Sprintf("Unable to delete data from database: %s", err.Error()))
+		logs.Logs(logDbError, fmt.Sprintf("Unable to delete data from database: %s", err.Error()))
 		return err
 	}
 	defer rows.Close()

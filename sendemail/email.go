@@ -10,6 +10,12 @@ import (
 	"github.com/Bevs-n-Devs/dearmatrongo/logs"
 )
 
+const (
+	logInfo    = 1
+	logWarning = 2
+	logError   = 3
+)
+
 /*
 SendEmailUK sends an email to DEARMATRON_UK_EMAIL with the report details:
 
@@ -19,12 +25,12 @@ It also sends a CC to DEAR_MATRON_RECIEVE_EMAIL as a backup. If the email creden
 The function logs the email credentials loading process and any errors that occur during the email sending process.
 */
 func SendEmailUK(name, email, phoneNumber, incidentDate, facilityType, facilityName, location, severity, affiliation, description string) error {
-	logs.Logs(1, "Uploading environment variables to database...")
+	logs.Logs(logInfo, "Uploading environment variables to database...")
 	if os.Getenv("DEAR_MATRON_SEND_EMAIL") == "" || os.Getenv("DEAR_MATRON_SEND_EMAIL_PASSWORD") == "" || os.Getenv("DEAR_MATRON_RECIEVE_EMAIL") == "" || os.Getenv("DEARMATRON_UK_EMAIL") == "" {
-		logs.Logs(2, "Could not get email credentials from Heroku. Loading from .env file...")
+		logs.Logs(logWarning, "Could not get email credentials from Heroku. Loading from .env file...")
 		err := env.LoadEnv("env/.env")
 		if err != nil {
-			logs.Logs(3, "Unable to load environment variables: "+err.Error())
+			logs.Logs(logError, "Unable to load environment variables: "+err.Error())
 		}
 	}
 
@@ -37,12 +43,12 @@ func SendEmailUK(name, email, phoneNumber, incidentDate, facilityType, facilityN
 	ccEmail := os.Getenv("DEAR_MATRON_RECIEVE_EMAIL")            // 2nd destination email as backup
 
 	if smptUser == "" || smptPassword == "" || recipient == "" || ccEmail == "" {
-		logs.Logs(3, "Email credentials are empty!")
+		logs.Logs(logError, "Email credentials are empty!")
 		return nil
 	}
 
 	if recipient == ccEmail {
-		logs.Logs(2, "Primary and secondary email addresses are the same, skipping CC")
+		logs.Logs(logWarning, "Primary and secondary email addresses are the same, skipping CC")
 		ccEmail = ""
 	}
 
@@ -70,10 +76,10 @@ func SendEmailUK(name, email, phoneNumber, incidentDate, facilityType, facilityN
 	auth := smtp.PlainAuth("", smptUser, smptPassword, smptHost)
 	err := smtp.SendMail(smptHost+":"+smptPort, auth, smptUser, []string{recipient, ccEmail}, []byte("Subject: "+subject+"\n\n"+body))
 	if err != nil {
-		logs.Logs(3, "Unable to send email: "+err.Error())
+		logs.Logs(logError, "Unable to send email: "+err.Error())
 		return err
 	}
-	logs.Logs(1, "Email sent successfully!")
+	logs.Logs(logInfo, "Email sent successfully!")
 	return nil
 }
 
@@ -86,12 +92,12 @@ It also sends a CC to DEAR_MATRON_RECIEVE_EMAIL as a backup. If the email creden
 The function logs the email credentials loading process and any errors that occur during the email sending process.
 */
 func SendEmailUSA(name, email, phoneNumber, incidentDate, facilityType, facilityName, location, severity, affiliation, description string) error {
-	logs.Logs(1, "Uploading environment variables to database...")
+	logs.Logs(logInfo, "Uploading environment variables to database...")
 	if os.Getenv("DEAR_MATRON_SEND_EMAIL") == "" || os.Getenv("DEAR_MATRON_SEND_EMAIL_PASSWORD") == "" || os.Getenv("DEAR_MATRON_RECIEVE_EMAIL") == "" || os.Getenv("DEARMATRON_USA_EMAIL") == "" {
-		logs.Logs(2, "Could not get email credentials from Heroku. Loading from .env file...")
+		logs.Logs(logWarning, "Could not get email credentials from Heroku. Loading from .env file...")
 		err := env.LoadEnv("env/.env")
 		if err != nil {
-			logs.Logs(3, "Unable to load environment variables: "+err.Error())
+			logs.Logs(logError, "Unable to load environment variables: "+err.Error())
 		}
 	}
 
@@ -104,12 +110,12 @@ func SendEmailUSA(name, email, phoneNumber, incidentDate, facilityType, facility
 	ccEmail := os.Getenv("DEAR_MATRON_RECIEVE_EMAIL")            // 2nd destination email as backup
 
 	if smptUser == "" || smptPassword == "" || recipient == "" || ccEmail == "" {
-		logs.Logs(3, "Email credentials are empty!")
+		logs.Logs(logError, "Email credentials are empty!")
 		return nil
 	}
 
 	if recipient == ccEmail {
-		logs.Logs(2, "Primary and secondary email addresses are the same, skipping CC")
+		logs.Logs(logWarning, "Primary and secondary email addresses are the same, skipping CC")
 		ccEmail = ""
 	}
 
@@ -137,19 +143,19 @@ func SendEmailUSA(name, email, phoneNumber, incidentDate, facilityType, facility
 	auth := smtp.PlainAuth("", smptUser, smptPassword, smptHost)
 	err := smtp.SendMail(smptHost+":"+smptPort, auth, smptUser, []string{recipient, ccEmail}, []byte("Subject: "+subject+"\n\n"+body))
 	if err != nil {
-		logs.Logs(3, "Unable to send email: "+err.Error())
+		logs.Logs(logError, "Unable to send email: "+err.Error())
 		return err
 	}
-	logs.Logs(1, "Email sent successfully!")
+	logs.Logs(logInfo, "Email sent successfully!")
 	return nil
 }
 
 func SearchDataPolicyDataFailed(name, email string) error {
 	if os.Getenv("DEAR_MATRON_SEND_EMAIL") == "" || os.Getenv("DEAR_MATRON_SEND_EMAIL_PASSWORD") == "" || os.Getenv("DEAR_MATRON_RECIEVE_EMAIL") == "" {
-		logs.Logs(2, "Could not get email credentials from Heroku. Loading from .env file...")
+		logs.Logs(logWarning, "Could not get email credentials from Heroku. Loading from .env file...")
 		err := env.LoadEnv("env/.env")
 		if err != nil {
-			logs.Logs(3, "Unable to load environment variables: "+err.Error())
+			logs.Logs(logError, "Unable to load environment variables: "+err.Error())
 		}
 	}
 
@@ -161,7 +167,7 @@ func SearchDataPolicyDataFailed(name, email string) error {
 	ccEmail := os.Getenv("DEAR_MATRON_RECIEVE_EMAIL")            // 2nd destination email as backup
 
 	if smptUser == "" || smptPassword == "" || ccEmail == "" {
-		logs.Logs(3, "Email credentials are empty!")
+		logs.Logs(logError, "Email credentials are empty!")
 		return nil
 	}
 
@@ -199,19 +205,19 @@ https://dearmatron.com
 	auth := smtp.PlainAuth("", smptUser, smptPassword, smptHost)
 	err := smtp.SendMail(smptHost+":"+smptPort, auth, smptUser, []string{email, ccEmail}, []byte("Subject: "+subject+"\n\n"+body))
 	if err != nil {
-		logs.Logs(3, "Unable to send email: "+err.Error())
+		logs.Logs(logError, "Unable to send email: "+err.Error())
 		return err
 	}
-	logs.Logs(1, "Email sent successfully!")
+	logs.Logs(logInfo, "Email sent successfully!")
 	return nil
 }
 
 func SearchDataPolicyDataFound(name, email, phoneNumber, incidentDate, facilityType, facilityName, location, severity, affiliation, description, claim, public, country, sendToEmail string) error {
 	if os.Getenv("DEAR_MATRON_SEND_EMAIL") == "" || os.Getenv("DEAR_MATRON_SEND_EMAIL_PASSWORD") == "" || os.Getenv("DEAR_MATRON_RECIEVE_EMAIL") == "" {
-		logs.Logs(2, "Could not get email credentials from Heroku. Loading from .env file...")
+		logs.Logs(logWarning, "Could not get email credentials from Heroku. Loading from .env file...")
 		err := env.LoadEnv("env/.env")
 		if err != nil {
-			logs.Logs(3, "Unable to load environment variables: "+err.Error())
+			logs.Logs(logError, "Unable to load environment variables: "+err.Error())
 		}
 	}
 
@@ -223,7 +229,7 @@ func SearchDataPolicyDataFound(name, email, phoneNumber, incidentDate, facilityT
 	ccEmail := os.Getenv("DEAR_MATRON_RECIEVE_EMAIL")            // 2nd destination email as backup
 
 	if smptUser == "" || smptPassword == "" || ccEmail == "" {
-		logs.Logs(3, "Email credentials are empty!")
+		logs.Logs(logError, "Email credentials are empty!")
 		return nil
 	}
 
@@ -268,9 +274,9 @@ https://dearmatron.com
 	// Send the email
 	err := smtp.SendMail(smptHost+":"+smptPort, auth, smptUser, []string{sendToEmail, ccEmail}, []byte(msg))
 	if err != nil {
-		logs.Logs(3, "Unable to send email: "+err.Error())
+		logs.Logs(logError, "Unable to send email: "+err.Error())
 		return err
 	}
-	logs.Logs(1, "Email sent successfully!")
+	logs.Logs(logInfo, "Email sent successfully!")
 	return nil
 }

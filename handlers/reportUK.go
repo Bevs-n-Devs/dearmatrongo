@@ -10,7 +10,7 @@ import (
 func ReportUK(w http.ResponseWriter, r *http.Request) {
 	err := Templates.ExecuteTemplate(w, "reportUK.html", nil)
 	if err != nil {
-		logs.Logs(3, fmt.Sprintf("Unable to load report page: %s", err.Error()))
+		logs.Logs(logError, fmt.Sprintf("Unable to load report page: %s", err.Error()))
 		http.Error(w, "Unable to load report page: "+err.Error(), http.StatusInternalServerError)
 	}
 }

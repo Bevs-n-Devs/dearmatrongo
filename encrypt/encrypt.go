@@ -22,14 +22,14 @@ func Encrypt(data []byte) ([]byte, error) {
 	// create a new AES cipher block using the master key
 	block, err := aes.NewCipher(masterKey)
 	if err != nil {
-		logs.Logs(3, fmt.Sprintf("Error creating AES cipher block: %s", err.Error()))
+		logs.Logs(logError, fmt.Sprintf("Error creating AES cipher block: %s", err.Error()))
 		return nil, err // Return error if key is invalid
 	}
 
 	// Create a GCM (Galois Counter Mode) cipher from the AES block
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
-		logs.Logs(3, fmt.Sprintf("Error creating GCM cipher: %s", err.Error()))
+		logs.Logs(logError, fmt.Sprintf("Error creating GCM cipher: %s", err.Error()))
 		return nil, err // Return error if GCM initialization fails
 	}
 
@@ -37,7 +37,7 @@ func Encrypt(data []byte) ([]byte, error) {
 	nonce := make([]byte, gcm.NonceSize())   // GCM nonce should be unique per encryption
 	_, err = io.ReadFull(rand.Reader, nonce) // Fill nonce with random bytes
 	if err != nil {
-		logs.Logs(3, fmt.Sprintf("Error generating nonce: %s", err.Error()))
+		logs.Logs(logError, fmt.Sprintf("Error generating nonce: %s", err.Error()))
 		return nil, err // Return error if random generation fails
 	}
 
@@ -46,6 +46,6 @@ func Encrypt(data []byte) ([]byte, error) {
 	ciphertext := gcm.Seal(nil, nonce, data, nil)
 
 	// Return the concatenated nonce + ciphertext
-	logs.Logs(1, "Data encrypted successfully")
+	logs.Logs(logInfo, "Data encrypted successfully")
 	return append(nonce, ciphertext...), nil
 }
