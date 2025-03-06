@@ -25,14 +25,14 @@ func Decrypt(data []byte) ([]byte, error) {
 	// Create a new AES cipher block using the same master key
 	block, err := aes.NewCipher(masterKey)
 	if err != nil {
-		logs.Logs(3, fmt.Sprintf("Error creating AES cipher block: %s", err.Error()))
+		logs.Logs(logError, fmt.Sprintf("Error creating AES cipher block: %s", err.Error()))
 		return nil, err // Return error if key is invalid
 	}
 
 	// Create a GCM cipher from the AES block
 	gcm, err := cipher.NewGCM(block)
 	if err != nil {
-		logs.Logs(3, fmt.Sprintf("Error creating GCM cipher: %s", err.Error()))
+		logs.Logs(logError, fmt.Sprintf("Error creating GCM cipher: %s", err.Error()))
 		return nil, err // Return error if GCM initialization fails
 	}
 
@@ -43,11 +43,11 @@ func Decrypt(data []byte) ([]byte, error) {
 	// Decrypt the ciphertext using AES-GCM
 	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
 	if err != nil {
-		logs.Logs(3, fmt.Sprintf("Error decrypting data: %s", err.Error()))
+		logs.Logs(logError, fmt.Sprintf("Error decrypting data: %s", err.Error()))
 		return nil, err // Return error if decryption fails
 	}
 
 	// Return the decrypted plaintext
-	logs.Logs(1, "Data decrypted successfully")
+	logs.Logs(logInfo, "Data decrypted successfully")
 	return plaintext, nil
 }

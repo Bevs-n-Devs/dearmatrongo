@@ -2,6 +2,13 @@ package database
 
 import "database/sql"
 
+const (
+	logWarning = 2
+	logError   = 3
+	logDb      = 4
+	logDbError = 5
+)
+
 var (
 	db *sql.DB // global db variable to hold db connection
 )

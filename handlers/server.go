@@ -10,12 +10,12 @@ import (
 )
 
 func StartHTTPServer() {
-	logs.Logs(1, "Starting Dear Matron app...")
+	logs.Logs(logInfo, "Starting Dear Matron app...")
 	// Initialize templates
 	InitTemplates()
 	err := encrypt.InitEncryption()
 	if err != nil {
-		logs.Logs(3, fmt.Sprintf("Error initializing encryption: %s", err.Error()))
+		logs.Logs(logError, fmt.Sprintf("Error initializing encryption: %s", err.Error()))
 	}
 
 	// Static file server for assets like CSS, JS, images
@@ -40,18 +40,18 @@ func StartHTTPServer() {
 	httpServerPort := os.Getenv("PORT")
 	// start server on local machine
 	if httpServerPort == "" {
-		logs.Logs(2, "Could not get PORT from Heroku. Starting server on default port http://localhost:9000...")
+		logs.Logs(logWarning, "Could not get PORT from Heroku. Starting server on default port http://localhost:9000...")
 		httpServerPort = "9000"
 		err := http.ListenAndServe(fmt.Sprintf(":%s", httpServerPort), nil)
 		if err != nil {
-			logs.Logs(3, fmt.Sprintf("HTTP server failed to start: %s", err.Error()))
+			logs.Logs(logError, fmt.Sprintf("HTTP server failed to start: %s", err.Error()))
 		}
 	}
 
 	// Start the server on Heroku port
-	logs.Logs(1, fmt.Sprintf("Server running on :%s", httpServerPort))
+	logs.Logs(logInfo, fmt.Sprintf("Server running on :%s", httpServerPort))
 	err = http.ListenAndServe(fmt.Sprintf(":%s", httpServerPort), nil)
 	if err != nil {
-		logs.Logs(3, fmt.Sprintf("HTTP server failed to start: %s", err.Error()))
+		logs.Logs(logError, fmt.Sprintf("HTTP server failed to start: %s", err.Error()))
 	}
 }

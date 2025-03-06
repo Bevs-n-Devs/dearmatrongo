@@ -9,11 +9,16 @@ import (
 	"github.com/Bevs-n-Devs/dearmatrongo/logs"
 )
 
+const (
+	logInfo    = 1
+	logDbError = 5
+)
+
 func main() {
 	go logs.ProcessLogs()
 	err := database.ConnectDB()
 	if err != nil {
-		logs.Logs(3, fmt.Sprintf("Failed to initialize database: %s", err.Error()))
+		logs.Logs(logDbError, fmt.Sprintf("Failed to initialize database: %s", err.Error()))
 	}
 	// defer database.CloseDB() // this keeps the database connection open
 
@@ -24,7 +29,7 @@ func main() {
 		for _, tmpl := range handlers.Templates.Templates() {
 			templateNames = append(templateNames, tmpl.Name())
 		}
-		logs.Logs(1, "Parsed templates: "+strings.Join(templateNames, ", "))
+		logs.Logs(logInfo, "Parsed templates: "+strings.Join(templateNames, ", "))
 	}()
 
 	select {}

@@ -3,8 +3,12 @@ package handlers
 import "html/template"
 
 const (
-	UK  = "UK"  // UK report type
-	USA = "USA" // USA report type
+	UK         = "UK"  // UK report type
+	USA        = "USA" // USA report type
+	logInfo    = 1
+	logWarning = 2
+	logError   = 3
+	logDb      = 4
 )
 
 var (

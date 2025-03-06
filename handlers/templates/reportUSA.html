@@ -102,7 +102,14 @@
                                     Report or Claim
                                 </a>
                             </li>
-                            <li><a href="/" style="color:white">UK</a></li>                     
+                            <li>
+                                <a href="/" 
+                                   style="color:white; text-decoration:none;"
+                                   onmouseover="this.style.color='#0ee0e7';"
+                                   onmouseout="this.style.color='white';">
+                                    UK
+                                </a>
+                            </li>                     
                         </ul>
                     </div>
                     <!-- /.navbar-collapse -->
@@ -232,9 +239,12 @@
                         <input type="email" name="email" id="email" placeholder="your email" required>
 
                         <label for="phone">Your Phone Number (Optional):</label>
-                        <input type="tel" id="phone" name="phone" placeholder="Enter your 10-digit phone number, including the 3-digit area code (e.g., (305) 555-6789)">
+                        <input type="tel" id="phone" name="phone" placeholder="Your number including state code">
 
                         <label for="incident_date">Incident Date:</label>
+                        {{ if .Error }}
+                            <label style="color: red;">{{ .Error }}</label>
+                        {{ end }}
                         <input type="date" id="incident_date" name="incident_date" required>
 
                         <label for="facility_type">Facility Type:</label>
