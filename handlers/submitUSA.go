@@ -40,6 +40,13 @@ func SubmitUSA(w http.ResponseWriter, r *http.Request) {
 	makeClaim := r.FormValue("make_claim")
 	makePublic := r.FormValue("make_public")
 
+	// check if incident date is valid
+	if !utils.ValidateDate(date) {
+		logs.Logs(logWarning, fmt.Sprintf("Invalid date format for incident date: %s. The incident date cannot be greater than the current date. Redirecting back to Dear Matron USA report page.", date))
+		http.Redirect(w, r, "/usa/report?error=The+incident+date+cannot+be+greater+than+the+current+date", http.StatusSeeOther)
+		return
+	}
+
 	err = database.CreateDearMatronReport(
 		name,
 		email,

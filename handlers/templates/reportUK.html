@@ -223,6 +223,9 @@
                         <input type="tel" id="phone" name="phone" placeholder="e.g., +44 123 456 7890">
 
                         <label for="incident_date">Incident Date:</label>
+                        {{ if .Error }}
+                            <label style="color: red;">{{ .Error }}</label>
+                        {{ end }}
                         <input type="date" id="incident_date" name="incident_date" required>
 
                         <label for="facility_type">Facility Type:</label>

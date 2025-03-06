@@ -8,9 +8,16 @@ import (
 )
 
 func ReportUK(w http.ResponseWriter, r *http.Request) {
-	err := Templates.ExecuteTemplate(w, "reportUK.html", nil)
+	errorMsg := r.URL.Query().Get("error")
+
+	// pass the error message to the template
+	data := map[string]interface{}{
+		"Error": errorMsg,
+	}
+
+	err := Templates.ExecuteTemplate(w, "reportUK.html", data)
 	if err != nil {
 		logs.Logs(logError, fmt.Sprintf("Unable to load report page: %s", err.Error()))
-		http.Error(w, "Unable to load report page: "+err.Error(), http.StatusInternalServerError)
+		http.Error(w, fmt.Sprintf("Unable to load report page: %s", err.Error()), http.StatusInternalServerError)
 	}
 }
